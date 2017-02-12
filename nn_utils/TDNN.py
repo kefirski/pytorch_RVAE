@@ -1,10 +1,7 @@
 import torch as t
-from torch.autograd import Variable
 from torch.nn import Parameter
 import torch.nn as nn
 import torch.nn.functional as F
-import parameters
-import numpy as np
 
 
 class TDNN(nn.Module):
@@ -32,16 +29,18 @@ class TDNN(nn.Module):
         assert input_size_len == 4, \
             'Wrong input rang, must be equal to 4, but found {}'.format(input_size_len)
 
-        [batch_size, max_seq_len, _, _] = input_size
+        [batch_size, max_seq_len, _, embed_size] = input_size
 
-        x = x.view(-1, self.params.max_word_len, self.params.char_embed_size)
-        x = x.transpose(1, 2)
+        assert embed_size == self.params.char_embed_size, \
+            'Wrong embedding size, must be equal to {}, but found {}'.format(self.params.char_embed_size, embed_size)
+
+        # some leaps with shape
+        x = x.view(-1, self.params.max_word_len, self.params.char_embed_size).transpose(1, 2).contiguous()
 
         xs = [F.relu(F.conv1d(x, kernel)) for kernel in self.kernels]
         xs = [t.max(x, 2)[0] for x in xs]
 
-        x = t.cat(xs, dimension=1)
-
+        x = t.cat(xs, 1)
         x = x.view(batch_size, max_seq_len, -1)
 
         return x
