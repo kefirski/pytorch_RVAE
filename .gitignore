@@ -3,8 +3,19 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# C extensions
+**/.idea
+experimentation.py
+*.DS_Store
+**/__pycache__
 *.so
+
+characters_vocab.pkl
+valid_character_tensor.npy
+train_character_tensor.npy
+word_embeddings.npy
+train_word_tensor.npy
+valid_word_tensor.npy
+words_vocab.pkl
 
 # Distribution / packaging
 .Python
