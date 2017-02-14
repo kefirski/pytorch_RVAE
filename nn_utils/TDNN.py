@@ -10,14 +10,15 @@ class TDNN(nn.Module):
 
         self.params = params
 
-        self.kernels = [Parameter(t.rand([out_dim, self.params.char_embed_size, kW])) for kW, out_dim in params.kernels]
-        self.add_to_parameters(self.kernels, 'TDNN_kernel')
+        self.kernels = [Parameter(t.rand([out_dim, self.params.char_embed_size, kW]).double()) for kW, out_dim in
+                        params.kernels]
+        self._add_to_parameters(self.kernels, 'TDNN_kernel')
 
     def forward(self, x):
         """
-        :param x: tensor with shape [batch_size, max_seq_len, max_word_len, char_embed_size]
+        :param x: tensor with shape [batch_size, max_seq_len, max_word_len, char_embed_size] of Double type
 
-        :return: tensor with shape [batch_size, max_seq_len, depth_sum]
+        :return: tensor with shape [batch_size, max_seq_len, depth_sum] of Double type
 
         :descr: applies multikenrel 1d-conv layer along every word in input with max-over-time pooling
             to emit fixed-size output
@@ -29,7 +30,7 @@ class TDNN(nn.Module):
         assert input_size_len == 4, \
             'Wrong input rang, must be equal to 4, but found {}'.format(input_size_len)
 
-        [batch_size, max_seq_len, _, embed_size] = input_size
+        [batch_size, seq_len, _, embed_size] = input_size
 
         assert embed_size == self.params.char_embed_size, \
             'Wrong embedding size, must be equal to {}, but found {}'.format(self.params.char_embed_size, embed_size)
@@ -41,10 +42,10 @@ class TDNN(nn.Module):
         xs = [t.max(x, 2)[0] for x in xs]
 
         x = t.cat(xs, 1)
-        x = x.view(batch_size, max_seq_len, -1)
+        x = x.view(batch_size, seq_len, -1)
 
         return x
 
-    def add_to_parameters(self, parameters, name):
+    def _add_to_parameters(self, parameters, name):
         for i, parameter in enumerate(parameters):
             self.register_parameter(name='{}-{}'.format(name, i), param=parameter)

@@ -13,15 +13,15 @@ class Highway(nn.Module):
 
         self.nonlinear = [nn.Linear(size, size) for _ in range(num_layers)]
         for i, module in enumerate(self.nonlinear):
-            self.add_to_parameters(module.parameters(), 'nonlinear_module_{}'.format(i))
+            self._add_to_parameters(module.parameters(), 'nonlinear_module_{}'.format(i))
 
         self.linear = [nn.Linear(size, size) for _ in range(num_layers)]
         for i, module in enumerate(self.linear):
-            self.add_to_parameters(module.parameters(), 'linear_module_{}'.format(i))
+            self._add_to_parameters(module.parameters(), 'linear_module_{}'.format(i))
 
         self.gate = [nn.Linear(size, size) for _ in range(num_layers)]
         for i, module in enumerate(self.gate):
-            self.add_to_parameters(module.parameters(), 'gate_module_{}'.format(i))
+            self._add_to_parameters(module.parameters(), 'gate_module_{}'.format(i))
 
         self.f = f
 
@@ -37,6 +37,7 @@ class Highway(nn.Module):
         """
 
         for layer in range(self.num_layers):
+
             gate = F.sigmoid(self.gate[layer](x))
 
             nonlinear = self.f(self.nonlinear[layer](x))
@@ -46,7 +47,7 @@ class Highway(nn.Module):
 
         return x
 
-    def add_to_parameters(self, parameters, name):
+    def _add_to_parameters(self, parameters, name):
         for i, parameter in enumerate(parameters):
             self.register_parameter(name='{}-{}'.format(name, i), param=parameter)
 
