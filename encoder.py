@@ -20,8 +20,8 @@ class Encoder(nn.Module):
 
         self.word_embed = nn.Embedding(self.params.word_vocab_size, self.params.word_embed_size)
         self.char_embed = nn.Embedding(self.params.char_vocab_size, self.params.char_embed_size)
-        self.word_embed.weight = Parameter(t.from_numpy(word_embed).double(), requires_grad=False)
-        self.char_embed.weight = Parameter(t.from_numpy(char_embed).double())
+        self.word_embed.weight = Parameter(t.from_numpy(word_embed).float(), requires_grad=False)
+        self.char_embed.weight = Parameter(t.from_numpy(char_embed).float())
 
         self.TDNN = TDNN(self.params)
 
@@ -38,10 +38,17 @@ class Encoder(nn.Module):
         :param word_input: tensor with shape of [batch_size, seq_len] of Long type
         :param character_input: tensor with shape of [batch_size, seq_len, max_word_len] of Long type
 
-        :return: mu and std of latent variable distribution both with shape of [batch_size, latent_variable_size]
+        :return: context of input sentenses with shape of [batch_size, latent_variable_size]
         """
 
-        [batch_size, max_seq_len] = word_input.size()
+        [batch_size, max_seq_len, max_word_len] = character_input.size()
+
+        assert word_input.size()[:2] == character_input.size()[:2], \
+            'Word input and character input must have the same sizes, but {} and {} found'.format(
+                word_input.size(), character_input.size())
+
+        assert max_word_len == self.params.max_word_len, \
+            'Wrong max_word_len, must be equal to {}, but {} found'.format(self.params.max_word_len, max_word_len)
 
         # character input fisrsly needs to be reshaped to be 2nd rang tensor, then reshaped again
         word_input = self.word_embed(word_input)
@@ -59,7 +66,7 @@ class Encoder(nn.Module):
         encoder_input = t.cat([word_input, character_input], 2)
 
         # unfold rnn with zero initial state and get its final state from last layer
-        zero_h = t.DoubleTensor([self.rnn.num_layers, batch_size, self.params.encoder_rnn_size]).zero_()
+        zero_h = Variable(t.FloatTensor(self.rnn.num_layers, batch_size, self.params.encoder_rnn_size).zero_())
         _, final_state = self.rnn(encoder_input, zero_h)
         final_state = final_state[-1]
 
@@ -67,4 +74,3 @@ class Encoder(nn.Module):
         context = F.relu(self.fc(context))
 
         return context
-
