@@ -1,3 +1,5 @@
+from utils import *
+
 class Parameters:
     def __init__(self, max_word_len, max_seq_len, word_vocab_size, char_vocab_size):
 
@@ -11,11 +13,12 @@ class Parameters:
         self.char_embed_size = 15
 
         self.kernels = [(1, 25), (2, 50), (3, 75), (4, 100), (5, 125), (6, 150)]
+        self.sum_depth = fold(lambda x, y: x + y, [depth for _, depth in self.kernels], 0)
 
-        self.encoder_rnn_size = [800, 950, 1100]
-        self.encoder_num_rnn_layers = len(self.encoder_rnn_size)
+        self.encoder_rnn_size = 1200
+        self.encoder_num_layers = 4
 
         self.latent_variable_size = 1200
 
         self.decoder_rnn_size = [1200, 1350, 1400]
-        self.decoder_num_rnn_layers = len(self.decoder_rnn_size)
+        self.decoder_num_layers = len(self.decoder_rnn_size)
