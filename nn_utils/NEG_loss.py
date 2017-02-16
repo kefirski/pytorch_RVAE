@@ -39,7 +39,7 @@ class NEG_loss(nn.Module):
         input = self.in_embed(input_labes)
         output = self.out_embed(out_labels)
 
-        noise = Variable(t.Tensor(batch_size, num_sampled).uniform_(0, self.num_classes).long())
+        noise = Variable(t.Tensor(batch_size, num_sampled).uniform_(0, self.num_classes - 1).long())
         if t.cuda.is_available():
             noise = noise.cuda()
         noise = self.out_embed(noise).neg()

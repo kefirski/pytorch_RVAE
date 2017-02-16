@@ -50,7 +50,7 @@ for iteration in range(args.num_iterations):
     out.backward()
     optimizer.step()
 
-    out = out.data.numpy()[0]
+    out = out.cpu().data.numpy()[0]
     if iteration % 500 == 0:
         print('iteration = {}, loss = {}'.format(iteration, out))
 
