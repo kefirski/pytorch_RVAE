@@ -51,3 +51,6 @@ class NEG_loss(nn.Module):
         loss = log_target + sum_log_sampled
 
         return -loss
+
+    def input_embeddings(self):
+        return self.in_embed.weight.numpy()
