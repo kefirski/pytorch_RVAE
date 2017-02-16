@@ -5,6 +5,7 @@ import torch.nn.functional as F
 
 
 class TDNN(nn.Module):
+
     def __init__(self, params):
         super(TDNN, self).__init__()
 
