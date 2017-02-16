@@ -6,7 +6,7 @@ from torch.autograd import Variable
 
 class NEG_loss(nn.Module):
 
-    def __init__(self, num_classes, embed_size):
+    def __init__(self, num_classes, embed_size, use_cuda):
         """
         :param num_classes: An int. The number of possible classes.
         :param embed_size: An int. Embedding size
@@ -22,6 +22,8 @@ class NEG_loss(nn.Module):
 
         self.in_embed = nn.Embedding(self.num_classes, self.embed_size)
         self.in_embed.weight = Parameter(t.FloatTensor(self.num_classes, self.embed_size).uniform_(-1, 1))
+
+        self.use_cuda = use_cuda
 
     def forward(self, input_labes, out_labels, num_sampled):
         """
@@ -40,7 +42,7 @@ class NEG_loss(nn.Module):
         output = self.out_embed(out_labels)
 
         noise = Variable(t.Tensor(batch_size, num_sampled).uniform_(0, self.num_classes - 1).long())
-        if t.cuda.is_available():
+        if self.use_cuda:
             noise = noise.cuda()
         noise = self.out_embed(noise).neg()
 

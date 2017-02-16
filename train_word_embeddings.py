@@ -17,6 +17,8 @@ parser.add_argument('--batch-size', type=int, default=10, metavar='BS',
                     help='batch size (default: 10)')
 parser.add_argument('--num-sample', type=int, default=5, metavar='NS',
                     help='num sample (default: 5)')
+parser.add_argument('--use-cuda', type=bool, default=True, metavar='CUDA',
+                    help='use cuda (default: True)')
 args = parser.parse_args()
 
 
@@ -26,10 +28,8 @@ params = p.Parameters(batch_loader.max_word_len,
                       batch_loader.words_vocab_size,
                       batch_loader.chars_vocab_size)
 
-use_cuda = t.cuda.is_available()
-
-neg = NEG_loss(params.word_vocab_size, params.word_embed_size)
-if use_cuda:
+neg = NEG_loss(params.word_vocab_size, params.word_embed_size, args.use_cuda)
+if args.use_cuda:
     neg = neg.cuda()
 
 # NEG_loss is defined over two embedding matrixes with shape of [params.word_vocab_size, params.word_embed_size]
@@ -41,7 +41,7 @@ for iteration in range(args.num_iterations):
 
     input = Variable(t.from_numpy(input_idx).long())
     target = Variable(t.from_numpy(target_idx).long())
-    if use_cuda:
+    if args.use_cuda:
         input, target = input.cuda(), target.cuda()
 
     out = neg(input, target, args.num_sample).mean()
