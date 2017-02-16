@@ -4,7 +4,7 @@ from torch.nn import Parameter
 from torch.optim import SGD
 from utils import *
 import parameters as p
-from NEG_loss import *
+from nn_utils.NEG_loss import *
 import numpy as np
 import sys
 import argparse
@@ -17,7 +17,7 @@ parser.add_argument('--batch-size', type=int, default=10, metavar='BS',
                     help='batch size (default: 10)')
 parser.add_argument('--num-sample', type=int, default=5, metavar='NS',
                     help='num sample (default: 5)')
-parser.add_argument('--use-cuda', type=bool, default=True, metavar='CUDA',
+parser.add_argument('--use-cuda', type=bool, default=False, metavar='CUDA',
                     help='use cuda (default: True)')
 args = parser.parse_args()
 
@@ -51,9 +51,9 @@ for iteration in range(args.num_iterations):
     out.backward()
     optimizer.step()
 
+    out = out.data.numpy()[0]
     if iteration % 500 == 0:
         print('iteration = {}, loss = {}'.format(iteration, out))
 
 word_embeddings = neg.input_embeddings()
 np.save('data/word_embeddings.npy', word_embeddings)
-
