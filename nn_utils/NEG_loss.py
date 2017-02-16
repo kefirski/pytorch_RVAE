@@ -1,7 +1,6 @@
 import torch as t
 from torch.nn import Parameter
 import torch.nn as nn
-import torch.nn.functional as F
 from torch.autograd import Variable
 
 
@@ -26,7 +25,7 @@ class NEG_loss(nn.Module):
 
     def forward(self, input_labes, out_labels, num_sampled):
         """
-        :param input: Tensor with shape of [batch_size] of Long type
+        :param input_labes: Tensor with shape of [batch_size] of Long type
         :param out_labels: Tensor with shape of [batch_size] of Long type
         :param num_sampled: An int. The number of sampled from noise examples
 
@@ -50,4 +49,4 @@ class NEG_loss(nn.Module):
 
         loss = log_target + sum_log_sampled
 
-        return loss
+        return -loss

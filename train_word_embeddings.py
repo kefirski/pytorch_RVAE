@@ -2,8 +2,6 @@ import torch as t
 from torch.autograd import Variable
 from torch.nn import Parameter
 from torch.optim import SGD
-import torch.nn as nn
-import torch.nn.functional as F
 from utils import *
 import parameters as p
 from NEG_loss import *
