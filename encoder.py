@@ -67,6 +67,9 @@ class Encoder(nn.Module):
 
         # unfold rnn with zero initial state and get its final state from last layer
         zero_h = Variable(t.FloatTensor(self.rnn.num_layers, batch_size, self.params.encoder_rnn_size).zero_())
+        if t.cuda.is_available():
+            zero_h = zero_h.cuda()
+
         _, final_state = self.rnn(encoder_input, zero_h)
         final_state = final_state[-1]
 

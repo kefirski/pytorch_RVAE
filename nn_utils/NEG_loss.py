@@ -40,6 +40,8 @@ class NEG_loss(nn.Module):
         output = self.out_embed(out_labels)
 
         noise = Variable(t.Tensor(batch_size, num_sampled).uniform_(0, self.num_classes).long())
+        if t.cuda.is_available():
+            noise = noise.cuda()
         noise = self.out_embed(noise).neg()
 
         log_target = (input * output).sum(1).squeeze().sigmoid().log()  # [batch_size]
