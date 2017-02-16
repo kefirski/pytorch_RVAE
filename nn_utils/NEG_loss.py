@@ -39,13 +39,14 @@ class NEG_loss(nn.Module):
         input = self.in_embed(input_labes)
         output = self.out_embed(out_labels)
 
-        noise = Variable(-t.Tensor(batch_size, num_sampled, self.embed_size).uniform_(-1, 1))
+        noise = Variable(t.Tensor(batch_size, num_sampled).uniform_(0, self.num_classes).long())
+        noise = self.out_embed(noise).neg()
 
-        log_target = (input * output).sum(1).sigmoid().log().squeeze()  # [batch_size]
+        log_target = (input * output).sum(1).squeeze().sigmoid().log()  # [batch_size]
 
-        ''' ∑[batch_size, num_sampled, embed_size] * [batch_size, embed_size] ->
+        ''' ∑[batch_size, num_sampled, embed_size] * [batch_size, embed_size, 1] ->
             ∑[batch_size, num_sampled] -> [batch_size] '''
-        sum_log_sampled = t.bmm(noise, input.unsqueeze(2)).squeeze().sigmoid().log().sum(1).squeeze()
+        sum_log_sampled = t.bmm(noise, input.unsqueeze(2)).sigmoid().log().sum(1).squeeze()
 
         loss = log_target + sum_log_sampled
 
