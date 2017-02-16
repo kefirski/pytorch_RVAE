@@ -18,25 +18,28 @@ class NEG_loss(nn.Module):
         self.num_classes = num_classes
         self.embed_size = embed_size
 
-        self.w = nn.Embedding(self.num_classes, self.embed_size)
-        self.w.weight = Parameter(t.randn([self.num_classes, self.embed_size]))
+        self.out_embed = nn.Embedding(self.num_classes, self.embed_size)
+        self.out_embed.weight = Parameter(t.FloatTensor(self.num_classes, self.embed_size).uniform_(-1, 1))
 
-    def forward(self, input, out_labels, num_sampled):
+        self.in_embed = nn.Embedding(self.num_classes, self.embed_size)
+        self.in_embed.weight = Parameter(t.FloatTensor(self.num_classes, self.embed_size).uniform_(-1, 1))
+
+    def forward(self, input_labes, out_labels, num_sampled):
         """
-        :param input: Tensor with shape of [batch_size, embed_size]
+        :param input: Tensor with shape of [batch_size] of Long type
         :param out_labels: Tensor with shape of [batch_size] of Long type
         :param num_sampled: An int. The number of sampled from noise examples
 
         :return: Loss estimation with shape of [batch_size]
+            loss defined in Mikolov et al. Distributed Representations of Words and Phrases and their Compositionality
+            papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf
         """
 
-        [batch_size, embed_size] = input.size()
+        [batch_size] = input_labes.size()
 
-        assert embed_size == self.embed_size, \
-            'Input tensor shape must be equal to [{}, {}], but [{}, {}] found'\
-                .format(batch_size, self.embed_size, batch_size, embed_size)
+        input = self.in_embed(input_labes)
+        output = self.out_embed(out_labels)
 
-        output = self.w(out_labels)
         noise = Variable(-t.Tensor(batch_size, num_sampled, self.embed_size).uniform_(-1, 1))
 
         log_target = (input * output).sum(1).sigmoid().log().squeeze()  # [batch_size]

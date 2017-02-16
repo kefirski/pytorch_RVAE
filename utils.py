@@ -284,7 +284,7 @@ class BatchLoader:
         # input and target
         result = np.array(result)
 
-        return result[:, 0], result[:, 1].reshape((-1, 1))
+        return result[:, 0], result[:, 1]
 
     def fake_data(self):
         encoder_word_input = np.zeros([1, 1])
