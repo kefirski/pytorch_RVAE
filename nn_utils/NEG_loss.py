@@ -10,6 +10,8 @@ class NEG_loss(nn.Module):
         """
         :param num_classes: An int. The number of possible classes.
         :param embed_size: An int. Embedding size
+        :param use_cuda: An bool. If true then samplings from noise will be stored in CUDA memory.
+            Notice that if use_cuda is True then it is necessary to store NEG_loss parameters in CUDA memory too
         """
 
         super(NEG_loss, self).__init__()
@@ -35,6 +37,13 @@ class NEG_loss(nn.Module):
             loss defined in Mikolov et al. Distributed Representations of Words and Phrases and their Compositionality
             papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf
         """
+
+        assert self.use_cuda and self.out_embed.weight.is_cuda and self.in_embed.weight.is_cuda or \
+            not (self.use_cuda or self.out_embed.weight.is_cuda or self.in_embed.weight.is_cuda), \
+            "Invalid CUDA options. If use_cuda = True, then model parameters should be stored in CUDA memory, " \
+            "got use_cuda = {}, out_embed = {}, in_embed = {}".format(self.use_cuda,
+                                                                      self.out_embed.weight.is_cuda,
+                                                                      self.in_embed.weight.is_cuda)
 
         [batch_size] = input_labes.size()
 
