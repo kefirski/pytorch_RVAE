@@ -87,11 +87,11 @@ class BatchLoader:
         self.go_token = '>'
         self.end_token = '|'
 
-        idx_exists = fold(fand,
+        idx_exists = fold(f_and,
                           [os.path.exists(file) for file in self.idx_files],
                           True)
 
-        tensors_exists = fold(fand,
+        tensors_exists = fold(f_and,
                               [os.path.exists(file) for target in self.tensor_files
                                for file in target],
                               True)

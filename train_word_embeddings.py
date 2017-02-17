@@ -28,7 +28,7 @@ params = p.Parameters(batch_loader.max_word_len,
                       batch_loader.words_vocab_size,
                       batch_loader.chars_vocab_size)
 
-neg = NEG_loss(params.word_vocab_size, params.word_embed_size, args.use_cuda)
+neg = NEG_loss(params.word_vocab_size, params.word_embed_size)
 if args.use_cuda:
     neg = neg.cuda()
 

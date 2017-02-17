@@ -3,9 +3,10 @@ from torch.autograd import Variable
 from torch.nn import Parameter
 import torch.nn as nn
 import torch.nn.functional as F
-from TDNN import *
+from nn_utils.TDNN import *
+from nn_utils.highway import *
 import parameters
-from highway import *
+from self_utils import *
 import numpy as np
 
 
@@ -50,6 +51,11 @@ class Encoder(nn.Module):
         assert max_word_len == self.params.max_word_len, \
             'Wrong max_word_len, must be equal to {}, but {} found'.format(self.params.max_word_len, max_word_len)
 
+        assert parameters_allocation_check(self), \
+            'Invalid CUDA options. out_embed and in_embed parameters both should be stored in the same memory'
+
+        use_cuda = self.word_embed.weight.is_cuda
+
         # character input fisrsly needs to be reshaped to be 2nd rang tensor, then reshaped again
         word_input = self.word_embed(word_input)
 
@@ -67,7 +73,7 @@ class Encoder(nn.Module):
 
         # unfold rnn with zero initial state and get its final state from last layer
         zero_h = Variable(t.FloatTensor(self.rnn.num_layers, batch_size, self.params.encoder_rnn_size).zero_())
-        if t.cuda.is_available():
+        if use_cuda:
             zero_h = zero_h.cuda()
 
         _, final_state = self.rnn(encoder_input, zero_h)
