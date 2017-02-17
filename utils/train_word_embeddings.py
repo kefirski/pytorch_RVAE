@@ -2,13 +2,11 @@ import torch as t
 from torch.autograd import Variable
 from torch.nn import Parameter
 from torch.optim import SGD
-from utils import *
-import parameters as p
+from utils.utils import *
+from utils.parameters import *
 from nn_utils.NEG_loss import *
 import numpy as np
-import sys
 import argparse
-
 
 parser = argparse.ArgumentParser(description='word2vec')
 parser.add_argument('--num-iterations', type=int, default=1000000, metavar='NI',
@@ -21,19 +19,18 @@ parser.add_argument('--use-cuda', type=bool, default=False, metavar='CUDA',
                     help='use cuda (default: True)')
 args = parser.parse_args()
 
-
 batch_loader = BatchLoader()
-params = p.Parameters(batch_loader.max_word_len,
-                      batch_loader.max_seq_len,
-                      batch_loader.words_vocab_size,
-                      batch_loader.chars_vocab_size)
+params = Parameters(batch_loader.max_word_len,
+                    batch_loader.max_seq_len,
+                    batch_loader.words_vocab_size,
+                    batch_loader.chars_vocab_size)
 
-neg = NEG_loss(params.word_vocab_size, params.word_embed_size)
+neg_loss = NEG_loss(params.word_vocab_size, params.word_embed_size)
 if args.use_cuda:
-    neg = neg.cuda()
+    neg_loss = neg_loss.cuda()
 
 # NEG_loss is defined over two embedding matrixes with shape of [params.word_vocab_size, params.word_embed_size]
-optimizer = SGD(neg.parameters(), 0.1)
+optimizer = SGD(neg_loss.parameters(), 0.1)
 
 for iteration in range(args.num_iterations):
 
@@ -44,7 +41,7 @@ for iteration in range(args.num_iterations):
     if args.use_cuda:
         input, target = input.cuda(), target.cuda()
 
-    out = neg(input, target, args.num_sample).mean()
+    out = neg_loss(input, target, args.num_sample).mean()
 
     optimizer.zero_grad()
     out.backward()
@@ -54,5 +51,5 @@ for iteration in range(args.num_iterations):
     if iteration % 500 == 0:
         print('iteration = {}, loss = {}'.format(iteration, out))
 
-word_embeddings = neg.input_embeddings()
+word_embeddings = neg_loss.input_embeddings()
 np.save('data/word_embeddings.npy', word_embeddings)

@@ -1,12 +1,12 @@
 import torch as t
-from torch.nn import Parameter
 import torch.nn as nn
 from torch.autograd import Variable
-from self_utils import *
+from torch.nn import Parameter
+
+from utils.self_utils import *
 
 
 class NEG_loss(nn.Module):
-
     def __init__(self, num_classes, embed_size):
         """
         :param num_classes: An int. The number of possible classes.
@@ -45,7 +45,8 @@ class NEG_loss(nn.Module):
         #                                                                   self.in_embed.weight.is_cuda)
 
         assert parameters_allocation_check(self), \
-            """Invalid CUDA options. out_embed and in_embed parameters both should be stored in the same memory
+            """
+            Invalid CUDA options. out_embed and in_embed parameters both should be stored in the same memory
             got out_embed.is_cuda = {}, in_embed.is_cuda = {}
             """.format(self.out_embed.weight.is_cuda, self.in_embed.weight.is_cuda)
 
@@ -72,4 +73,4 @@ class NEG_loss(nn.Module):
         return -loss
 
     def input_embeddings(self):
-        return self.in_embed.weight.cpu().numpy()
+        return self.in_embed.weight.data.cpu().numpy()

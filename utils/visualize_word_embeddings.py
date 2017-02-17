@@ -1,5 +1,5 @@
 from sklearn.decomposition import PCA
-from utils import BatchLoader
+from utils.utils import *
 import matplotlib.pyplot as plt
 import numpy as np
 import os

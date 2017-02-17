@@ -5,7 +5,6 @@ import torch.nn.functional as F
 
 
 class Highway(nn.Module):
-
     def __init__(self, size, num_layers, f):
 
         super(Highway, self).__init__()
@@ -38,7 +37,6 @@ class Highway(nn.Module):
         """
 
         for layer in range(self.num_layers):
-
             gate = F.sigmoid(self.gate[layer](x))
 
             nonlinear = self.f(self.nonlinear[layer](x))
@@ -51,4 +49,3 @@ class Highway(nn.Module):
     def _add_to_parameters(self, parameters, name):
         for i, parameter in enumerate(parameters):
             self.register_parameter(name='{}-{}'.format(name, i), param=parameter)
-

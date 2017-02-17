@@ -1,10 +1,10 @@
 from utils import *
 
+
 class Parameters:
     def __init__(self, max_word_len, max_seq_len, word_vocab_size, char_vocab_size):
-
         self.max_word_len = int(max_word_len)
-        self.max_seq_len = int(max_seq_len) + 1 # go or eos token
+        self.max_seq_len = int(max_seq_len) + 1  # go or eos token
 
         self.word_vocab_size = int(word_vocab_size)
         self.char_vocab_size = int(char_vocab_size)
@@ -20,5 +20,5 @@ class Parameters:
 
         self.latent_variable_size = 1200
 
-        self.decoder_rnn_size = [1200, 1350, 1400]
-        self.decoder_num_layers = len(self.decoder_rnn_size)
+        self.decoder_rnn_size = 1500
+        self.decoder_num_layers = 4

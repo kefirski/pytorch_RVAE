@@ -1,8 +1,10 @@
-import numpy as np
-import os
 import collections
+import os
 import re
+
+import numpy as np
 from six.moves import cPickle
+
 from self_utils import *
 
 
@@ -240,12 +242,12 @@ class BatchLoader:
         # sorry
         for i, line in enumerate(decoder_input):
             line_len = input_seq_len[i]
-            to_add = self.max_seq_len - line_len
+            to_add = max_input_seq_len - line_len
             decoder_input[i] = line + [self.word_to_idx[self.pad_token]] * to_add
 
         for i, line in enumerate(decoder_output):
             line_len = input_seq_len[i]
-            to_add = self.max_seq_len - line_len
+            to_add = max_input_seq_len - line_len
             decoder_output[i] = line + [self.encode_word(self.word_to_idx[self.pad_token])] * to_add
 
         for i, line in enumerate(encoder_word_input):
