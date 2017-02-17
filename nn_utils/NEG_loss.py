@@ -37,13 +37,6 @@ class NEG_loss(nn.Module):
             papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf
         """
 
-        # assert self.use_cuda and self.out_embed.weight.is_cuda and self.in_embed.weight.is_cuda or \
-        #     not (self.use_cuda or self.out_embed.weight.is_cuda or self.in_embed.weight.is_cuda), \
-        #     """Invalid CUDA options. use_cuda = True if and only if model parameters are storing in CUDA memory,
-        #        got use_cuda = {}, out_embed = {}, in_embed = {}""".format(self.use_cuda,
-        #                                                                   self.out_embed.weight.is_cuda,
-        #                                                                   self.in_embed.weight.is_cuda)
-
         assert parameters_allocation_check(self), \
             """
             Invalid CUDA options. out_embed and in_embed parameters both should be stored in the same memory
@@ -62,7 +55,7 @@ class NEG_loss(nn.Module):
             noise = noise.cuda()
         noise = self.out_embed(noise).neg()
 
-        log_target = (input * output).sum(1).squeeze().sigmoid().log()  # [batch_size]
+        log_target = (input * output).sum(1).squeeze().sigmoid().log()
 
         ''' ∑[batch_size, num_sampled, embed_size] * [batch_size, embed_size, 1] ->
             ∑[batch_size, num_sampled] -> [batch_size] '''

@@ -4,7 +4,6 @@ from utils.self_utils import *
 
 
 class Decoder(nn.Module):
-
     def __init__(self, params):
         super(Decoder, self).__init__()
 
@@ -47,5 +46,3 @@ class Decoder(nn.Module):
         result = self.fc(self.hw2(result))
 
         return result
-
-
