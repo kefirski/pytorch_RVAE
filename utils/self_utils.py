@@ -11,5 +11,5 @@ def f_or(x, y):
 
 
 def parameters_allocation_check(module):
-    parmeters = module.parameters()
+    parmeters = list(module.parameters())
     return fold(f_and, parmeters, True) or not fold(f_or, parmeters, False)
