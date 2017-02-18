@@ -60,8 +60,6 @@ class RVAE(nn.Module):
                got encoder.seq_len = {}, decoder.seq_len = {}
             """.format(seq_len, decoder_input.size()[1] - 1)
 
-        train = False
-
         if z is None:
             encoder_word_input = self.word_embed(encoder_word_input)
 
@@ -79,6 +77,9 @@ class RVAE(nn.Module):
             std = t.exp(0.5 * logvar)
 
             z = Variable(t.randn([batch_size, self.params.latent_variable_size]))
+            if use_cuda:
+                z = z.cuda()
+
             z = z * std + mu
 
             kld = -0.5 * (1 + logvar - t.pow(mu, 2) - t.exp(logvar)).sum(1).squeeze()
@@ -86,6 +87,7 @@ class RVAE(nn.Module):
             train = True
         else:
             kld = None
+            train = False
 
         z = F.dropout(z, p=drop_prob, training=train)
 
