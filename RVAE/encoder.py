@@ -5,8 +5,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from nn_utils.TDNN import *
 from nn_utils.highway import *
-from utils.parameters import *
-from utils.self_utils import *
+from parameters import *
+from self_utils import *
 import numpy as np
 
 
@@ -15,14 +15,6 @@ class Encoder(nn.Module):
         super(Encoder, self).__init__()
 
         self.params = params
-
-        word_embed = np.load('data/word_embeddings.npy')
-        char_embed = np.random.uniform(-1, 1, [self.params.char_vocab_size, self.params.char_embed_size])
-
-        self.word_embed = nn.Embedding(self.params.word_vocab_size, self.params.word_embed_size)
-        self.char_embed = nn.Embedding(self.params.char_vocab_size, self.params.char_embed_size)
-        self.word_embed.weight = Parameter(t.from_numpy(word_embed).float(), requires_grad=False)
-        self.char_embed.weight = Parameter(t.from_numpy(char_embed).float())
 
         self.TDNN = TDNN(self.params)
 
@@ -38,41 +30,29 @@ class Encoder(nn.Module):
 
     def forward(self, word_input, character_input):
         """
-        :param word_input: tensor with shape of [batch_size, seq_len] of Long type
-        :param character_input: tensor with shape of [batch_size, seq_len, max_word_len] of Long type
+        :param word_input: tensor with shape of [batch_size, seq_len, word_embed_size]
+        :param character_input: tensor with shape of [batch_size, seq_len, max_word_len, char_embed_size]
 
         :return: context of input sentenses with shape of [batch_size, latent_variable_size]
         """
 
-        [batch_size, seq_len, max_word_len] = character_input.size()
+        [batch_size, seq_len, _] = word_input.size()
 
         assert word_input.size()[:2] == character_input.size()[:2], \
             'Word input and character input must have the same sizes, but {} and {} found'.format(
                 word_input.size(), character_input.size())
 
-        assert max_word_len == self.params.max_word_len, \
-            'Wrong max_word_len, must be equal to {}, but {} found'.format(self.params.max_word_len, max_word_len)
-
         assert parameters_allocation_check(self), \
             'Invalid CUDA options. Parameters should be allocated in the same memory'
 
-        use_cuda = self.word_embed.weight.is_cuda
-
-        # character input fisrsly needs to be reshaped to be 2nd rang tensor, then reshaped again
-        word_input = self.word_embed(word_input)
-
-        character_input = character_input.view(-1, self.params.max_word_len)
-        character_input = self.char_embed(character_input)
-        character_input = character_input.view(batch_size,
-                                               seq_len,
-                                               self.params.max_word_len,
-                                               self.params.char_embed_size)
+        use_cuda = list(self.rnn.parameters())[0].is_cuda
 
         character_input = self.TDNN(character_input)
 
         # for now encoder input is tensor with shape [batch_size, seq_len, word_embed_size + depth_sum]
         encoder_input = t.cat([word_input, character_input], 2)
-        encoder_input = self.hw1(encoder_input)
+        encoder_input = self.hw1(encoder_input.view(-1, self.params.word_embed_size + self.params.sum_depth))
+        encoder_input = encoder_input.view(batch_size, seq_len, self.params.word_embed_size + self.params.sum_depth)
 
         # unfold rnn with zero initial state and get its final state from last layer
         zero_h = Variable(t.FloatTensor(self.rnn.num_layers, batch_size, self.params.encoder_rnn_size).zero_())
