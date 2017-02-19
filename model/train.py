@@ -68,5 +68,5 @@ if __name__ == "__main__":
         optimizer.step()
 
         print('i = {}, BCE = {}, KLD = {}'.format(iteration,
-                                                  bce.mean().cpu().numpy(),
-                                                  kld.mean().cpu().numpy()))
+                                                  bce.mean().data.cpu().numpy(),
+                                                  kld.mean().data.cpu().numpy()))
