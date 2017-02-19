@@ -44,7 +44,7 @@ class Decoder(nn.Module):
         initial_state = initial_state.view(batch_size, self.params.decoder_num_layers, self.params.decoder_rnn_size)
 
         # for now initial_state is tensor with shape of [num_layers, batch_size, decoder_rnn_size]
-        initial_state = initial_state.transpose(0, 1)
+        initial_state = initial_state.transpose(0, 1).contiguous()
 
         rnn_out, final_state = self.rnn(decoder_input, initial_state)
         rnn_out = rnn_out.contiguous().view(-1, self.params.decoder_rnn_size)
