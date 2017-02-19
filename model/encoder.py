@@ -1,10 +1,10 @@
 import torch as t
-from torch.autograd import Variable
 import torch.nn as nn
 import torch.nn.functional as F
-from nn_utils.TDNN import TDNN
-from nn_utils.highway import Highway
-from self_utils import *
+from torch.autograd import Variable
+from TDNN import TDNN
+from highway import Highway
+from functional import *
 
 
 class Encoder(nn.Module):

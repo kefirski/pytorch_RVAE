@@ -9,6 +9,7 @@ experimentation.py
 **/__pycache__
 *.so
 
+word_embedding.png
 characters_vocab.pkl
 valid_character_tensor.npy
 train_character_tensor.npy

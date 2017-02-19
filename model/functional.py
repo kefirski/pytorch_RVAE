@@ -13,3 +13,13 @@ def f_or(x, y):
 def parameters_allocation_check(module):
     parmeters = list(module.parameters())
     return fold(f_and, parmeters, True) or not fold(f_or, parmeters, False)
+
+
+def handle_inputs(inputs, use_cuda):
+    import torch as t
+    from torch.autograd import Variable
+
+    result = [Variable(t.from_numpy(var)) for var in inputs]
+    result = [var.cuda() if use_cuda else var for var in result]
+
+    return result

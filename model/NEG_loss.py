@@ -2,7 +2,7 @@ import torch as t
 import torch.nn as nn
 from torch.autograd import Variable
 from torch.nn import Parameter
-from self_utils import *
+from functional import *
 
 
 class NEG_loss(nn.Module):

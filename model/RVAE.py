@@ -1,13 +1,13 @@
+import numpy as np
 import torch as t
-from torch.autograd import Variable
-from torch.nn import Parameter
 import torch.nn as nn
 import torch.nn.functional as F
-from self_utils import *
+from torch.autograd import Variable
+from torch.nn import Parameter
+
 from decoder import Decoder
 from encoder import Encoder
-import os
-import numpy as np
+from functional import *
 
 
 class RVAE(nn.Module):
@@ -16,7 +16,7 @@ class RVAE(nn.Module):
 
         self.params = params
 
-        word_embed = np.load('data/word_embeddings.npy')
+        word_embed = np.load('../data/word_embeddings.npy')
         char_embed = np.random.uniform(-1, 1, [self.params.char_vocab_size, self.params.char_embed_size])
 
         self.word_embed = nn.Embedding(self.params.word_vocab_size, self.params.word_embed_size)
@@ -37,7 +37,7 @@ class RVAE(nn.Module):
         :param encoder_character_input: An tensor with shape of [batch_size, seq_len, max_word_len] of Long type
         :param decoder_input: An tensor with shape of [batch_size, seq_len + 1] of Long type
 
-        :param drop_prob: probability of an element of context to be zeroed on sence of dropout
+        :param drop_prob: probability of an element of context to be zeroed in sence of dropout
 
         :param z: context if sampling is performing
 
@@ -97,3 +97,7 @@ class RVAE(nn.Module):
         out, final_state = self.decoder(decoder_input, z)
 
         return out, final_state, kld
+
+    def learnable_paramters(self):
+        # word_enbedding is constant parameter thus it must be dropped from list of parameters for optimizer
+        return [p for p in self.parameters() if p.requires_grad]

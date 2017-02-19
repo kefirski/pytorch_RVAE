@@ -1,8 +1,7 @@
-import torch as t
 import torch.nn as nn
 import torch.nn.functional as F
-from nn_utils.highway import Highway
-from self_utils import *
+from highway import Highway
+from functional import *
 
 
 class Decoder(nn.Module):
