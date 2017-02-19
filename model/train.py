@@ -67,4 +67,6 @@ if __name__ == "__main__":
         loss.backward()
         optimizer.step()
 
-        print(iteration)
+        print('i = {}, BCE = {}, KLD = {}'.format(iteration,
+                                                  bce.mean().cpu().numpy(),
+                                                  kld.mean().cpu().numpy()))
