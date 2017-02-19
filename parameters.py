@@ -1,4 +1,4 @@
-from utils import *
+from self_utils import fold
 
 
 class Parameters:

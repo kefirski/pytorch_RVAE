@@ -1,5 +1,7 @@
-from nn_utils.TDNN import *
-from nn_utils.highway import *
+import torch as t
+import torch.nn as nn
+import torch.nn.functional as F
+from nn_utils.highway import Highway
 from self_utils import *
 
 

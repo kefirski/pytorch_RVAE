@@ -3,13 +3,10 @@ from torch.autograd import Variable
 from torch.nn import Parameter
 import torch.nn as nn
 import torch.nn.functional as F
-from nn_utils.TDNN import *
-from nn_utils.highway import *
-from parameters import *
 from self_utils import *
-from decoder import *
-from encoder import *
-
+from decoder import Decoder
+from encoder import Encoder
+import os
 import numpy as np
 
 
@@ -34,7 +31,7 @@ class RVAE(nn.Module):
 
         self.decoder = Decoder(self.params)
 
-    def forward(self, encoder_word_input, encoder_character_input, decoder_input, drop_prob, z=None):
+    def forward(self, drop_prob, encoder_word_input=None, encoder_character_input=None, decoder_input=None, z=None):
         """
         :param encoder_word_input: An tensor with shape of [batch_size, seq_len] of Long type
         :param encoder_character_input: An tensor with shape of [batch_size, seq_len, max_word_len] of Long type
@@ -53,14 +50,19 @@ class RVAE(nn.Module):
             'Invalid CUDA options. Parameters should be allocated in the same memory'
         use_cuda = self.word_embed.weight.is_cuda
 
-        [batch_size, seq_len] = encoder_word_input.size()
-
-        assert seq_len == decoder_input.size()[1] - 1, \
-            """Invalid sequence lenghts. encoder.seq_len must be equal to decoder.seq_len - 1
-               got encoder.seq_len = {}, decoder.seq_len = {}
-            """.format(seq_len, decoder_input.size()[1] - 1)
+        assert z is None and fold(lambda acc, parameter: acc and parameter is not None,
+                                  [encoder_word_input, encoder_character_input, decoder_input],
+                                  True), \
+            "Ivalid input. If z is None then encoder and decoder inputs should be passed as arguments"
 
         if z is None:
+            [batch_size, seq_len] = encoder_word_input.size()
+
+            assert seq_len == decoder_input.size()[1] - 1, \
+                """Invalid sequence lenghts. encoder.seq_len must be equal to decoder.seq_len - 1
+                   got encoder.seq_len = {}, decoder.seq_len = {}
+                """.format(seq_len, decoder_input.size()[1] - 1)
+
             encoder_word_input = self.word_embed(encoder_word_input)
 
             encoder_character_input = encoder_character_input.view(-1, self.params.max_word_len)

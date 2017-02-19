@@ -73,16 +73,16 @@ class BatchLoader:
                         in case of performance
         '''
 
-        self.data_files = ['data/train.txt',
-                           'data/test.txt']
+        self.data_files = ['./data/train.txt',
+                           './data/test.txt']
 
-        self.idx_files = ['data/words_vocab.pkl',
-                          'data/characters_vocab.pkl']
+        self.idx_files = ['./data/words_vocab.pkl',
+                          './data/characters_vocab.pkl']
 
-        self.tensor_files = [['data/train_word_tensor.npy',
-                              'data/valid_word_tensor.npy'],
-                             ['data/train_character_tensor.npy',
-                              'data/valid_character_tensor.npy']]
+        self.tensor_files = [['./data/train_word_tensor.npy',
+                              './data/valid_word_tensor.npy'],
+                             ['./data/train_character_tensor.npy',
+                              './data/valid_character_tensor.npy']]
 
         self.blind_symbol = ''
         self.pad_token = '_'
