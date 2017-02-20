@@ -20,7 +20,7 @@ if __name__ == "__main__":
                         help='num iterations (default: 40000)')
     parser.add_argument('--batch-size', type=int, default=35, metavar='BS',
                         help='batch size (default: 35)')
-    parser.add_argument('--use-cuda', type=bool, default=True, metavar='CUDA',
+    parser.add_argument('--use-cuda', type=bool, default=False, metavar='CUDA',
                         help='use cuda (default: True)')
     parser.add_argument('--learning-rate', type=float, default=0.00005, metavar='LR',
                         help='learning rate (default: 0.00005)')
@@ -54,12 +54,18 @@ if __name__ == "__main__":
         input = [var.cuda() if args.use_cuda else var for var in input]
         [encoder_word_input, encoder_character_input, decoder_input, target] = input
 
+        [batch_size, seq_len] = decoder_input.size()
+
         logits, _, kld = rvae(args.dropout, encoder_word_input, encoder_character_input, decoder_input, z=None)
 
+        logits = logits.view(-1, parameters.word_vocab_size)
         prediction = F.softmax(logits)
+        target = target.view(-1, parameters.word_vocab_size)
 
         # firsly NLL loss estimated, then summed over sequence to emit [batch_size] shaped BCE
-        bce = (t.log(prediction) * target).sum(2).neg().sum(1).squeeze()
+        bce = (prediction.log() * target) \
+            .view(batch_size, seq_len, parameters.word_vocab_size) \
+            .sum(2).neg().sum(1).squeeze()
 
         loss = (bce + kld).mean()
 
