@@ -22,7 +22,8 @@ class RVAE(nn.Module):
         self.word_embed = nn.Embedding(self.params.word_vocab_size, self.params.word_embed_size)
         self.char_embed = nn.Embedding(self.params.char_vocab_size, self.params.char_embed_size)
         self.word_embed.weight = Parameter(t.from_numpy(word_embed).float(), requires_grad=False)
-        self.char_embed.weight = Parameter(t.from_numpy(char_embed).float())
+        self.char_embed.weight = Parameter(
+            t.Tensor(self.params.char_vocab_size, self.params.char_embed_size).uniform_(-1, 1))
 
         self.encoder = Encoder(self.params)
 
@@ -85,7 +86,6 @@ class RVAE(nn.Module):
             z = z * std + mu
 
             kld = -0.5 * (1 + logvar - t.pow(mu, 2) - t.exp(logvar)).sum(1).squeeze()
-
             train = True
         else:
             kld = None

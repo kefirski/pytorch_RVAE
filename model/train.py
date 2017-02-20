@@ -7,7 +7,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.optim import Adam
 from RVAE import RVAE
-from functional import handle_inputs
+from functional import handle_inputs, kld_coef
 import argparse
 
 if __name__ == "__main__":
@@ -45,7 +45,6 @@ if __name__ == "__main__":
         # TRAIN
         encoder_word_input, encoder_character_input, _, \
         decoder_input, target = batch_loader.next_batch(args.batch_size, 'train')
-
         [encoder_word_input, encoder_character_input, decoder_input, target] = [Variable(t.from_numpy(var)) for var in
                                                                                 [encoder_word_input,
                                                                                  encoder_character_input,
@@ -67,12 +66,46 @@ if __name__ == "__main__":
             .view(batch_size, seq_len, parameters.word_vocab_size) \
             .sum(2).neg().sum(1).squeeze()
 
-        loss = (bce + kld).mean()
+        loss = (bce + kld_coef(iteration) * kld).mean()
 
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
 
-        print('i = {}, BCE = {}, KLD = {}'.format(iteration,
-                                                  bce.mean().data.cpu().numpy(),
-                                                  kld.mean().data.cpu().numpy()))
+        print('i = {}, BCE = {}, KLD = {}, coef = {}'.format(iteration,
+                                                             bce.mean().data.cpu().numpy(),
+                                                             kld.mean().data.cpu().numpy(),
+                                                             kld_coef(iteration)))
+
+        # VALIDATION
+        if iteration % 20 == 0:
+            encoder_word_input, encoder_character_input, _, \
+            decoder_input, target = batch_loader.next_batch(1, 'validation')
+            [encoder_word_input, encoder_character_input, decoder_input] = [Variable(t.from_numpy(var)) for var
+                                                                            in
+                                                                            [encoder_word_input,
+                                                                             encoder_character_input,
+                                                                             decoder_input]]
+            input = [encoder_word_input.long(), encoder_character_input.long(), decoder_input.long()]
+            input = [var.cuda() if args.use_cuda else var for var in input]
+            [encoder_word_input, encoder_character_input, decoder_input] = input
+
+            [batch_size, seq_len] = decoder_input.size()
+
+            logits, _, _ = rvae(args.dropout, encoder_word_input, encoder_character_input, decoder_input, z=None)
+
+            logits = logits.view(-1, parameters.word_vocab_size)
+            prediction = F.softmax(logits)
+            prediction = prediction.data.cpu().numpy()
+
+            target = " ".join([batch_loader.sample_word_from_distribution(p) for p in target[0]])
+            reconstruction = " ".join([batch_loader.sample_word_from_distribution(pred) for pred in prediction])
+
+            print("\n \
+            ----------VALIDATION---------- \
+            reconstruction --------------- \
+            {} \
+            target -----------------------\
+            {} \
+            ------------------------------ \
+            ".format(reconstruction, target))

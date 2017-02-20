@@ -23,3 +23,8 @@ def handle_inputs(inputs, use_cuda):
     result = [var.cuda() if use_cuda else var for var in result]
 
     return result
+
+
+def kld_coef(i):
+    import math
+    return math.tanh(i/4000)

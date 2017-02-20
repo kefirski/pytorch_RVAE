@@ -10,8 +10,8 @@ class TDNN(nn.Module):
 
         self.params = params
 
-        self.kernels = [Parameter(t.rand([out_dim, self.params.char_embed_size, kW])) for kW, out_dim in
-                        params.kernels]
+        self.kernels = [Parameter(t.Tensor(out_dim, self.params.char_embed_size, kW).uniform_(-1, 1))
+                        for kW, out_dim in params.kernels]
         self._add_to_parameters(self.kernels, 'TDNN_kernel')
 
     def forward(self, x):
@@ -39,7 +39,7 @@ class TDNN(nn.Module):
         x = x.view(-1, self.params.max_word_len, self.params.char_embed_size).transpose(1, 2).contiguous()
 
         xs = [F.relu(F.conv1d(x, kernel)) for kernel in self.kernels]
-        xs = [t.max(x, 2)[0] for x in xs]
+        xs = [x.max(2)[0].squeeze() for x in xs]
 
         x = t.cat(xs, 1)
         x = x.view(batch_size, seq_len, -1)
