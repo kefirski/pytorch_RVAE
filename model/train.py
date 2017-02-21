@@ -8,6 +8,7 @@ import torch.nn.functional as F
 from torch.optim import Adam
 from RVAE import RVAE
 from functional import handle_inputs, kld_coef
+import numpy as np
 import argparse
 
 if __name__ == "__main__":
@@ -72,10 +73,11 @@ if __name__ == "__main__":
         loss.backward()
         optimizer.step()
 
-        print('i = {}, BCE = {}, KLD = {}, coef = {}'.format(iteration,
-                                                             bce.mean().data.cpu().numpy(),
-                                                             kld.mean().data.cpu().numpy(),
-                                                             kld_coef(iteration)))
+        if iteration % 10 == 0:
+            print('i = {}, BCE = {}, KLD = {}, coef = {}'.format(iteration,
+                                                                 bce.mean().data.cpu().numpy(),
+                                                                 kld.mean().data.cpu().numpy(),
+                                                                 kld_coef(iteration)))
 
         # VALIDATION
         if iteration % 20 == 0:
@@ -92,7 +94,7 @@ if __name__ == "__main__":
 
             [batch_size, seq_len] = decoder_input.size()
 
-            logits, _, _ = rvae(args.dropout, encoder_word_input, encoder_character_input, decoder_input, z=None)
+            logits, _, _ = rvae(0., encoder_word_input, encoder_character_input, decoder_input, z=None)
 
             logits = logits.view(-1, parameters.word_vocab_size)
             prediction = F.softmax(logits)
@@ -101,11 +103,40 @@ if __name__ == "__main__":
             target = " ".join([batch_loader.sample_word_from_distribution(p) for p in target[0]])
             reconstruction = " ".join([batch_loader.sample_word_from_distribution(pred) for pred in prediction])
 
-            print("\n \
-            ----------VALIDATION---------- \
-            reconstruction --------------- \
-            {} \
-            target -----------------------\
-            {} \
-            ------------------------------ \
-            ".format(reconstruction, target))
+            print('\n')
+            print('----------VALIDATION----------')
+            print('--------reconstruction--------')
+            print(reconstruction)
+            print('-----------target-------------')
+            print(target)
+            print('------------------------------')
+
+        # SAMPLE
+        if iteration % 20 == 0:
+            seed = np.random.normal(size=[1, parameters.latent_variable_size])
+            seed = Variable(t.from_numpy(seed).float())
+
+            decoder_input_np = batch_loader.fake_data(1)
+            decoder_input = Variable(t.from_numpy(decoder_input_np).long())
+
+            result = ''
+
+            for i in range(35):
+                logits, _, _ = rvae(0., None, None, decoder_input, seed)
+
+                logits = logits.view(-1, parameters.word_vocab_size)
+                prediction = F.softmax(logits)
+
+                words = [batch_loader.sample_word_from_distribution(p) for p in [prediction.data.cpu().numpy()[-1]]]
+
+                result += ' ' + " ".join(words)
+
+                words = [[batch_loader.word_to_idx[word] for word in words]]
+                decoder_input_np = np.append(decoder_input_np, words, 1)
+                decoder_input = Variable(t.from_numpy(decoder_input_np).long())
+
+            print('\n')
+            print('------------SAMPLE------------')
+            print('------------------------------')
+            print(result)
+            print('------------------------------')

@@ -18,9 +18,9 @@ class Encoder(nn.Module):
         self.hw1 = Highway(self.params.sum_depth + self.params.word_embed_size, 4, F.relu)
 
         self.rnn = nn.GRU(input_size=self.params.word_embed_size + self.params.sum_depth,
-                          hidden_size=self.params.encoder_rnn_size,
-                          num_layers=self.params.encoder_num_layers,
-                          batch_first=True)
+                           hidden_size=self.params.encoder_rnn_size,
+                           num_layers=self.params.encoder_num_layers,
+                           batch_first=True)
 
         self.hw2 = Highway(self.rnn.hidden_size, 4, F.relu)
         self.fc = nn.Linear(self.rnn.hidden_size, self.params.latent_variable_size)

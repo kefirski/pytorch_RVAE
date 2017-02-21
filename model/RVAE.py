@@ -53,7 +53,8 @@ class RVAE(nn.Module):
 
         assert z is None and fold(lambda acc, parameter: acc and parameter is not None,
                                   [encoder_word_input, encoder_character_input, decoder_input],
-                                  True), \
+                                  True) \
+               or (z is not None and decoder_input is not None), \
             "Ivalid input. If z is None then encoder and decoder inputs should be passed as arguments"
 
         if z is None:

@@ -288,12 +288,10 @@ class BatchLoader:
 
         return result[:, 0], result[:, 1]
 
-    def fake_data(self):
-        encoder_word_input = np.zeros([1, 1])
-        encoder_character_aware_input = np.zeros([1, 1, self.max_word_len])
-        encoder_seq_len = [1]
+    def fake_data(self, batch_size):
+        decoder_input = [[self.word_to_idx[self.go_token]] for _ in range(batch_size)]
 
-        return encoder_word_input, encoder_character_aware_input, encoder_seq_len
+        return np.array(decoder_input)
 
     def encode_word(self, idx):
         result = np.zeros(self.words_vocab_size)
