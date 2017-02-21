@@ -27,8 +27,8 @@ class RVAE(nn.Module):
 
         self.encoder = Encoder(self.params)
 
-        self.context_to_mu = nn.Linear(self.params.latent_variable_size, self.params.latent_variable_size)
-        self.context_to_logvar = nn.Linear(self.params.latent_variable_size, self.params.latent_variable_size)
+        self.context_to_mu = nn.Linear(self.params.encoder_rnn_size, self.params.latent_variable_size)
+        self.context_to_logvar = nn.Linear(self.params.encoder_rnn_size, self.params.latent_variable_size)
 
         self.decoder = Decoder(self.params)
 
@@ -86,7 +86,7 @@ class RVAE(nn.Module):
 
             z = z * std + mu
 
-            kld = -0.5 * (1 + logvar - t.pow(mu, 2) - t.exp(logvar)).sum(1).squeeze()
+            kld = -0.5 * t.sum(logvar - t.pow(mu, 2) - t.exp(logvar) + 1, 1).squeeze()
             train = True
         else:
             kld = None

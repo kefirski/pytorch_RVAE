@@ -4,6 +4,7 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 from TDNN import TDNN
 from highway import Highway
+from selfGRU import self_GRU
 from functional import *
 
 
@@ -17,13 +18,18 @@ class Encoder(nn.Module):
 
         self.hw1 = Highway(self.params.sum_depth + self.params.word_embed_size, 4, F.relu)
 
-        self.rnn = nn.GRU(input_size=self.params.word_embed_size + self.params.sum_depth,
-                           hidden_size=self.params.encoder_rnn_size,
-                           num_layers=self.params.encoder_num_layers,
-                           batch_first=True)
+        # self.rnn = nn.GRU(input_size=self.params.word_embed_size + self.params.sum_depth,
+        #                    hidden_size=self.params.encoder_rnn_size,
+        #                    num_layers=self.params.encoder_num_layers,
+        #                    batch_first=True)
+
+        self.rnn = self_GRU(input_size=self.params.word_embed_size + self.params.sum_depth,
+                            hidden_size=self.params.encoder_rnn_size,
+                            num_layers=self.params.encoder_num_layers,
+                            batch_first=True)
 
         self.hw2 = Highway(self.rnn.hidden_size, 4, F.relu)
-        self.fc = nn.Linear(self.rnn.hidden_size, self.params.latent_variable_size)
+        self.fc = nn.Linear(self.rnn.hidden_size, self.rnn.hidden_size)
 
     def forward(self, word_input, character_input):
         """
@@ -52,11 +58,7 @@ class Encoder(nn.Module):
         encoder_input = encoder_input.view(batch_size, seq_len, self.params.word_embed_size + self.params.sum_depth)
 
         # unfold rnn with zero initial state and get its final state from last layer
-        zero_h = Variable(t.FloatTensor(self.rnn.num_layers, batch_size, self.params.encoder_rnn_size).zero_())
-        if use_cuda:
-            zero_h = zero_h.cuda()
-
-        _, final_state = self.rnn(encoder_input, zero_h)
+        _, final_state = self.rnn(encoder_input)
         final_state = final_state[-1]
 
         context = self.hw2(final_state)
