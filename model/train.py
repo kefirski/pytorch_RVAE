@@ -75,7 +75,7 @@ if __name__ == "__main__":
         loss.backward()
         optimizer.step()
 
-        if iteration % 1 == 0:
+        if iteration % 5 == 0:
             print('i = {}, BCE = {}, KLD = {}, coef = {}'.format(iteration,
                                                                  bce.mean().data.cpu().numpy(),
                                                                  kld.data.cpu().numpy(),
@@ -114,37 +114,37 @@ if __name__ == "__main__":
         #     print('------------------------------')
 
         # SAMPLE
-        # if iteration % 20 == 0:
-        #     seed = np.random.normal(size=[1, parameters.latent_variable_size])
-        #     seed = Variable(t.from_numpy(seed).float())
-        #     if args.use_cuda:
-        #         seed = seed.cuda()
-        #
-        #     decoder_input_np = batch_loader.fake_data(1)
-        #     decoder_input = Variable(t.from_numpy(decoder_input_np).long())
-        #     if args.use_cuda:
-        #         decoder_input = decoder_input.cuda()
-        #
-        #     result = ''
-        #
-        #     for i in range(35):
-        #         logits, _, _ = rvae(0., None, None, decoder_input, seed)
-        #
-        #         logits = logits.view(-1, parameters.word_vocab_size)
-        #         prediction = F.softmax(logits)
-        #
-        #         words = [batch_loader.sample_word_from_distribution(p) for p in [prediction.data.cpu().numpy()[-1]]]
-        #
-        #         result += ' ' + " ".join(words)
-        #
-        #         words = [[batch_loader.word_to_idx[word] for word in words]]
-        #         decoder_input_np = np.append(decoder_input_np, words, 1)
-        #         decoder_input = Variable(t.from_numpy(decoder_input_np).long())
-        #         if args.use_cuda:
-        #             decoder_input = decoder_input.cuda()
-        #
-        #     print('\n')
-        #     print('------------SAMPLE------------')
-        #     print('------------------------------')
-        #     print(result)
-        #     print('------------------------------')
+        if iteration % 20 == 0:
+            seed = np.random.normal(size=[1, parameters.latent_variable_size])
+            seed = Variable(t.from_numpy(seed).float())
+            if args.use_cuda:
+                seed = seed.cuda()
+
+            decoder_input_np = batch_loader.fake_data(1)
+            decoder_input = Variable(t.from_numpy(decoder_input_np).long())
+            if args.use_cuda:
+                decoder_input = decoder_input.cuda()
+
+            result = ''
+
+            for i in range(35):
+                logits, _, _ = rvae(0., None, None, decoder_input, seed)
+
+                logits = logits.view(-1, parameters.word_vocab_size)
+                prediction = F.softmax(logits)
+
+                words = [batch_loader.sample_word_from_distribution(p) for p in [prediction.data.cpu().numpy()[-1]]]
+
+                result += ' ' + " ".join(words)
+
+                words = [[batch_loader.word_to_idx[word] for word in words]]
+                decoder_input_np = np.append(decoder_input_np, words, 1)
+                decoder_input = Variable(t.from_numpy(decoder_input_np).long())
+                if args.use_cuda:
+                    decoder_input = decoder_input.cuda()
+
+            print('\n')
+            print('------------SAMPLE------------')
+            print('------------------------------')
+            print(result)
+            print('------------------------------')
