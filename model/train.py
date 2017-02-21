@@ -21,7 +21,7 @@ if __name__ == "__main__":
                         help='num iterations (default: 40000)')
     parser.add_argument('--batch-size', type=int, default=35, metavar='BS',
                         help='batch size (default: 35)')
-    parser.add_argument('--use-cuda', type=bool, default=True, metavar='CUDA',
+    parser.add_argument('--use-cuda', type=bool, default=False, metavar='CUDA',
                         help='use cuda (default: True)')
     parser.add_argument('--learning-rate', type=float, default=0.0001, metavar='LR',
                         help='learning rate (default: 0.0001)')
@@ -46,8 +46,6 @@ if __name__ == "__main__":
         # TRAIN
         encoder_word_input, encoder_character_input, _, \
         decoder_input, target = batch_loader.next_batch(args.batch_size, 'train')
-        for batch in encoder_word_input:
-            print([batch_loader.sample_word_from_distribution(p) for p in batch])
         [encoder_word_input, encoder_character_input, decoder_input, target] = [Variable(t.from_numpy(var)) for var in
                                                                                 [encoder_word_input,
                                                                                  encoder_character_input,

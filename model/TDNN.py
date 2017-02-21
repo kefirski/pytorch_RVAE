@@ -44,8 +44,6 @@ class TDNN(nn.Module):
         x = t.cat(xs, 1)
         x = x.view(batch_size, seq_len, -1)
 
-        print(x)
-
         return x
 
     def _add_to_parameters(self, parameters, name):

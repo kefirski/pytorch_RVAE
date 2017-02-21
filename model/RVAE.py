@@ -60,11 +60,6 @@ class RVAE(nn.Module):
         if z is None:
             [batch_size, seq_len] = encoder_word_input.size()
 
-            assert seq_len == decoder_input.size()[1] - 1, \
-                """Invalid sequence lenghts. encoder.seq_len must be equal to decoder.seq_len - 1
-                   got encoder.seq_len = {}, decoder.seq_len = {}
-                """.format(seq_len, decoder_input.size()[1] - 1)
-
             encoder_word_input = self.word_embed(encoder_word_input)
 
             encoder_character_input = encoder_character_input.view(-1, self.params.max_word_len)
