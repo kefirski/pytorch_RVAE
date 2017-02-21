@@ -46,6 +46,8 @@ if __name__ == "__main__":
         # TRAIN
         encoder_word_input, encoder_character_input, _, \
         decoder_input, target = batch_loader.next_batch(args.batch_size, 'train')
+        for batch in encoder_word_input:
+            print([batch_loader.sample_word_from_distribution(p) for p in batch])
         [encoder_word_input, encoder_character_input, decoder_input, target] = [Variable(t.from_numpy(var)) for var in
                                                                                 [encoder_word_input,
                                                                                  encoder_character_input,
