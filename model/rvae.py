@@ -8,7 +8,7 @@ from torch.nn import Parameter
 from decoder import Decoder
 from encoder import Encoder
 from functional import *
-
+from selfModules.selflinear import self_Linear
 
 class RVAE(nn.Module):
     def __init__(self, params):
@@ -27,8 +27,8 @@ class RVAE(nn.Module):
 
         self.encoder = Encoder(self.params)
 
-        self.context_to_mu = nn.Linear(self.params.encoder_rnn_size, self.params.latent_variable_size)
-        self.context_to_logvar = nn.Linear(self.params.encoder_rnn_size, self.params.latent_variable_size)
+        self.context_to_mu = self_Linear(self.params.encoder_rnn_size, self.params.latent_variable_size)
+        self.context_to_logvar = self_Linear(self.params.encoder_rnn_size, self.params.latent_variable_size)
 
         self.decoder = Decoder(self.params)
 
@@ -82,6 +82,7 @@ class RVAE(nn.Module):
             z = z * std + mu
 
             kld = -0.5 * t.sum(logvar - t.pow(mu, 2) - t.exp(logvar) + 1, 1).squeeze()
+
             train = True
         else:
             kld = None

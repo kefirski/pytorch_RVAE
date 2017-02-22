@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.decomposition import PCA
 
-from utils import BatchLoader
+from batch_loader import BatchLoader
 
 if __name__ == "__main__":
     if not os.path.exists('../data/word_embeddings.npy'):

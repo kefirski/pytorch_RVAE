@@ -1,12 +1,12 @@
 import os
-from utils import BatchLoader
+from batch_loader import BatchLoader
 from parameters import Parameters
 import torch as t
 from torch.autograd import Variable
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.optim import Adam
-from RVAE import RVAE
+from rvae import RVAE
 from functional import handle_inputs, kld_coef
 import numpy as np
 import argparse
@@ -78,38 +78,6 @@ if __name__ == "__main__":
                                                                  bce.mean().data.cpu().numpy(),
                                                                  kld.data.cpu().numpy(),
                                                                  kld_coef(iteration)))
-
-        # VALIDATION
-        # if iteration % 20 == 0:
-        #     encoder_word_input, encoder_character_input, _, \
-        #     decoder_input, target = batch_loader.next_batch(1, 'validation')
-        #     [encoder_word_input, encoder_character_input, decoder_input] = [Variable(t.from_numpy(var)) for var
-        #                                                                     in
-        #                                                                     [encoder_word_input,
-        #                                                                      encoder_character_input,
-        #                                                                      decoder_input]]
-        #     input = [encoder_word_input.long(), encoder_character_input.long(), decoder_input.long()]
-        #     input = [var.cuda() if args.use_cuda else var for var in input]
-        #     [encoder_word_input, encoder_character_input, decoder_input] = input
-        #
-        #     [batch_size, seq_len] = decoder_input.size()
-        #
-        #     logits, _, _ = rvae(0., encoder_word_input, encoder_character_input, decoder_input, z=None)
-        #
-        #     logits = logits.view(-1, parameters.word_vocab_size)
-        #     prediction = F.softmax(logits)
-        #     prediction = prediction.data.cpu().numpy()
-        #
-        #     target = " ".join([batch_loader.sample_word_from_distribution(p) for p in target[0]])
-        #     reconstruction = " ".join([batch_loader.sample_word_from_distribution(pred) for pred in prediction])
-        #
-        #     print('\n')
-        #     print('----------VALIDATION----------')
-        #     print('--------reconstruction--------')
-        #     print(reconstruction)
-        #     print('-----------target-------------')
-        #     print(target)
-        #     print('------------------------------')
 
         # SAMPLE
         if iteration % 20 == 0:

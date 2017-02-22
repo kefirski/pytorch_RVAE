@@ -2,6 +2,7 @@ import torch as t
 from torch.nn import Parameter
 import torch.nn as nn
 import torch.nn.functional as F
+from selfModules.selflinear import self_Linear
 
 
 class Highway(nn.Module):
@@ -11,15 +12,15 @@ class Highway(nn.Module):
 
         self.num_layers = num_layers
 
-        self.nonlinear = [nn.Linear(size, size) for _ in range(num_layers)]
+        self.nonlinear = [self_Linear(size, size) for _ in range(num_layers)]
         for i, module in enumerate(self.nonlinear):
             self._add_to_parameters(module.parameters(), 'nonlinear_module_{}'.format(i))
 
-        self.linear = [nn.Linear(size, size) for _ in range(num_layers)]
+        self.linear = [self_Linear(size, size) for _ in range(num_layers)]
         for i, module in enumerate(self.linear):
             self._add_to_parameters(module.parameters(), 'linear_module_{}'.format(i))
 
-        self.gate = [nn.Linear(size, size) for _ in range(num_layers)]
+        self.gate = [self_Linear(size, size) for _ in range(num_layers)]
         for i, module in enumerate(self.gate):
             self._add_to_parameters(module.parameters(), 'gate_module_{}'.format(i))
 

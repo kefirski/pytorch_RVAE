@@ -1,7 +1,8 @@
 import torch.nn as nn
 import torch.nn.functional as F
-from highway import Highway
 from functional import *
+from selfModules.highway import Highway
+from selfModules.selflinear import self_Linear
 
 
 class Decoder(nn.Module):
@@ -12,8 +13,8 @@ class Decoder(nn.Module):
 
         self.hw1 = Highway(self.params.latent_variable_size, 3, F.relu)
 
-        self.context_to_state = nn.Linear(self.params.latent_variable_size,
-                                          self.params.decoder_rnn_size * self.params.decoder_num_layers)
+        self.context_to_state = self_Linear(self.params.latent_variable_size,
+                                            self.params.decoder_rnn_size * self.params.decoder_num_layers)
 
         self.rnn = nn.GRU(input_size=self.params.word_embed_size,
                           hidden_size=self.params.decoder_rnn_size,
@@ -22,7 +23,7 @@ class Decoder(nn.Module):
 
         self.hw2 = Highway(self.params.decoder_rnn_size, 3, F.relu)
 
-        self.fc = nn.Linear(self.params.decoder_rnn_size, self.params.word_vocab_size)
+        self.fc = self_Linear(self.params.decoder_rnn_size, self.params.word_vocab_size)
 
     def forward(self, decoder_input, z):
         """

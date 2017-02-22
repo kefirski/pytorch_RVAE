@@ -1,11 +1,12 @@
 import torch as t
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.autograd import Variable
-from TDNN import TDNN
-from highway import Highway
-from selfGRU import self_GRU
+
 from functional import *
+from selfModules.tdnn import TDNN
+from selfModules.highway import Highway
+from selfModules.selfgru import self_GRU
+from selfModules.selflinear import self_Linear
 
 
 class Encoder(nn.Module):
@@ -18,18 +19,13 @@ class Encoder(nn.Module):
 
         self.hw1 = Highway(self.params.sum_depth + self.params.word_embed_size, 4, F.relu)
 
-        # self.rnn = nn.GRU(input_size=self.params.word_embed_size + self.params.sum_depth,
-        #                    hidden_size=self.params.encoder_rnn_size,
-        #                    num_layers=self.params.encoder_num_layers,
-        #                    batch_first=True)
-
         self.rnn = self_GRU(input_size=self.params.word_embed_size + self.params.sum_depth,
                             hidden_size=self.params.encoder_rnn_size,
                             num_layers=self.params.encoder_num_layers,
                             batch_first=True)
 
         self.hw2 = Highway(self.rnn.hidden_size, 4, F.relu)
-        self.fc = nn.Linear(self.rnn.hidden_size, self.rnn.hidden_size)
+        self.fc = self_Linear(self.rnn.hidden_size, self.rnn.hidden_size)
 
     def forward(self, word_input, character_input):
         """
@@ -47,8 +43,6 @@ class Encoder(nn.Module):
 
         assert parameters_allocation_check(self), \
             'Invalid CUDA options. Parameters should be allocated in the same memory'
-
-        use_cuda = list(self.rnn.parameters())[0].is_cuda
 
         character_input = self.TDNN(character_input)
 

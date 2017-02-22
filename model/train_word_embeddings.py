@@ -2,9 +2,9 @@ import torch as t
 from torch.autograd import Variable
 from torch.optim import SGD
 import numpy as np
-from utils import BatchLoader
+from batch_loader import BatchLoader
 from parameters import Parameters
-from NEG_loss import NEG_loss
+from neg import NEG_loss
 
 import argparse
 
