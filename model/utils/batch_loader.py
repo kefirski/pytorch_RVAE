@@ -5,11 +5,11 @@ import re
 import numpy as np
 from six.moves import cPickle
 
-from functional import *
+from utils.functional import *
 
 
 class BatchLoader:
-    def __init__(self):
+    def __init__(self, path='../../'):
 
         '''
             :properties
@@ -73,16 +73,16 @@ class BatchLoader:
                         in case of performance
         '''
 
-        self.data_files = ['../data/train.txt',
-                           '../data/test.txt']
+        self.data_files = [path + 'data/train.txt',
+                           path + 'data/test.txt']
 
-        self.idx_files = ['../data/words_vocab.pkl',
-                          '../data/characters_vocab.pkl']
+        self.idx_files = [path + 'data/words_vocab.pkl',
+                          path + 'data/characters_vocab.pkl']
 
-        self.tensor_files = [['../data/train_word_tensor.npy',
-                              '../data/valid_word_tensor.npy'],
-                             ['../data/train_character_tensor.npy',
-                              '../data/valid_character_tensor.npy']]
+        self.tensor_files = [[path + 'data/train_word_tensor.npy',
+                              path + 'data/valid_word_tensor.npy'],
+                             [path + 'data/train_character_tensor.npy',
+                              path + 'data/valid_character_tensor.npy']]
 
         self.blind_symbol = ''
         self.pad_token = '_'
@@ -95,7 +95,7 @@ class BatchLoader:
 
         tensors_exists = fold(f_and,
                               [os.path.exists(file) for target in self.tensor_files
-                                for file in target],
+                               for file in target],
                               True)
 
         if idx_exists and tensors_exists:

@@ -1,4 +1,5 @@
-from functional import *
+from utils.functional import *
+
 
 class Parameters:
     def __init__(self, max_word_len, max_seq_len, word_vocab_size, char_vocab_size):

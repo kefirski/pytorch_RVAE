@@ -4,11 +4,11 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 from torch.nn import Parameter
-
 from decoder import Decoder
 from encoder import Encoder
-from functional import *
 from selfModules.selflinear import self_Linear
+from utils.functional import *
+
 
 class RVAE(nn.Module):
     def __init__(self, params):
@@ -17,7 +17,6 @@ class RVAE(nn.Module):
         self.params = params
 
         word_embed = np.load('../data/word_embeddings.npy')
-        char_embed = np.random.uniform(-1, 1, [self.params.char_vocab_size, self.params.char_embed_size])
 
         self.word_embed = nn.Embedding(self.params.word_vocab_size, self.params.word_embed_size)
         self.char_embed = nn.Embedding(self.params.char_vocab_size, self.params.char_embed_size)

@@ -27,4 +27,4 @@ def handle_inputs(inputs, use_cuda):
 
 def kld_coef(i):
     import math
-    return math.tanh(i/4000)
+    return math.tanh(i / 1200)

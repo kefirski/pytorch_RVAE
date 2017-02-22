@@ -1,21 +1,22 @@
 import os
+
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.decomposition import PCA
 
-from batch_loader import BatchLoader
+from utils.batch_loader import BatchLoader
 
 if __name__ == "__main__":
-    if not os.path.exists('../data/word_embeddings.npy'):
+    if not os.path.exists('../../data/word_embeddings.npy'):
         raise FileNotFoundError("word embdeddings file was't found")
 
     pca = PCA(n_components=2)
-    word_embeddings = np.load('../data/word_embeddings.npy')
+    word_embeddings = np.load('../../data/word_embeddings.npy')
     word_embeddings_pca = pca.fit_transform(word_embeddings)
 
     batch_loader = BatchLoader()
     words = batch_loader.idx_to_word
-    
+
     fig, ax = plt.subplots()
     fig.set_size_inches(150, 150)
     x = word_embeddings_pca[:, 0]

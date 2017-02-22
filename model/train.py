@@ -1,15 +1,16 @@
-import os
-from batch_loader import BatchLoader
-from parameters import Parameters
-import torch as t
-from torch.autograd import Variable
-import torch.nn as nn
-import torch.nn.functional as F
-from torch.optim import Adam
-from rvae import RVAE
-from functional import handle_inputs, kld_coef
-import numpy as np
 import argparse
+import os
+
+import numpy as np
+import torch as t
+import torch.nn.functional as F
+from torch.autograd import Variable
+from torch.optim import Adam
+
+from rvae import RVAE
+from utils.batch_loader import BatchLoader
+from utils.functional import kld_coef
+from utils.parameters import Parameters
 
 if __name__ == "__main__":
 
@@ -30,7 +31,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    batch_loader = BatchLoader()
+    batch_loader = BatchLoader('../')
     parameters = Parameters(batch_loader.max_word_len,
                             batch_loader.max_seq_len,
                             batch_loader.words_vocab_size,

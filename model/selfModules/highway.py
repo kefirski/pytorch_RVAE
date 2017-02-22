@@ -1,5 +1,3 @@
-import torch as t
-from torch.nn import Parameter
 import torch.nn as nn
 import torch.nn.functional as F
 from selfModules.selflinear import self_Linear

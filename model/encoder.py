@@ -2,11 +2,11 @@ import torch as t
 import torch.nn as nn
 import torch.nn.functional as F
 
-from functional import *
-from selfModules.tdnn import TDNN
 from selfModules.highway import Highway
 from selfModules.selfgru import self_GRU
 from selfModules.selflinear import self_Linear
+from selfModules.tdnn import TDNN
+from utils.functional import *
 
 
 class Encoder(nn.Module):
