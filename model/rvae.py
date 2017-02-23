@@ -6,8 +6,8 @@ from torch.autograd import Variable
 from torch.nn import Parameter
 from decoder import Decoder
 from encoder import Encoder
-from selfModules.selflinear import self_Linear
 from utils.functional import *
+from utils.selfModules.selflinear import self_Linear
 
 
 class RVAE(nn.Module):

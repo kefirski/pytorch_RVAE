@@ -1,6 +1,7 @@
 import torch.nn as nn
 import torch.nn.functional as F
-from selfModules.selflinear import self_Linear
+
+from utils.selfModules.selflinear import self_Linear
 
 
 class Highway(nn.Module):

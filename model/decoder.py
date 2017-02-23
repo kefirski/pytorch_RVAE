@@ -1,9 +1,8 @@
 import torch.nn as nn
 import torch.nn.functional as F
-
-from selfModules.highway import Highway
-from selfModules.selflinear import self_Linear
+from utils.selfModules.highway import Highway
 from utils.functional import *
+from utils.selfModules.selflinear import self_Linear
 
 
 class Decoder(nn.Module):

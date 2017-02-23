@@ -1,12 +1,10 @@
 import argparse
 import os
-
 import numpy as np
 import torch as t
 import torch.nn.functional as F
 from torch.autograd import Variable
 from torch.optim import Adam
-
 from rvae import RVAE
 from utils.batch_loader import BatchLoader
 from utils.functional import kld_coef
@@ -20,14 +18,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='RVAE')
     parser.add_argument('--num-iterations', type=int, default=40000, metavar='NI',
                         help='num iterations (default: 40000)')
-    parser.add_argument('--batch-size', type=int, default=35, metavar='BS',
-                        help='batch size (default: 35)')
-    parser.add_argument('--use-cuda', type=bool, default=False, metavar='CUDA',
+    parser.add_argument('--batch-size', type=int, default=22, metavar='BS',
+                        help='batch size (default: 22)')
+    parser.add_argument('--use-cuda', type=bool, default=True, metavar='CUDA',
                         help='use cuda (default: True)')
     parser.add_argument('--learning-rate', type=float, default=0.0001, metavar='LR',
                         help='learning rate (default: 0.0001)')
-    parser.add_argument('--dropout', type=float, default=0.2, metavar='DR',
-                        help='dropout (default: 0.2)')
+    parser.add_argument('--dropout', type=float, default=0.3, metavar='DR',
+                        help='dropout (default: 0.3)')
 
     args = parser.parse_args()
 
@@ -75,10 +73,17 @@ if __name__ == "__main__":
         optimizer.step()
 
         if iteration % 5 == 0:
-            print('i = {}, BCE = {}, KLD = {}, coef = {}'.format(iteration,
-                                                                 bce.mean().data.cpu().numpy(),
-                                                                 kld.data.cpu().numpy(),
-                                                                 kld_coef(iteration)))
+            print('\n')
+            print('------------TRAIN-------------')
+            print('----------ITERATION-----------')
+            print(iteration)
+            print('-------------BCE--------------')
+            print(bce.mean().data.cpu().numpy()[0])
+            print('-------------KLD--------------')
+            print(kld.mean().data.cpu().numpy()[0])
+            print('-----------KLD-coef-----------')
+            print(kld_coef(iteration))
+            print('------------------------------')
 
         # SAMPLE
         if iteration % 20 == 0:
