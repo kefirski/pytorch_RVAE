@@ -43,19 +43,22 @@ if __name__ == "__main__":
 
     for iteration in range(args.num_iterations):
         # TRAIN
-        encoder_word_input, encoder_character_input, _, \
-        decoder_input, target = batch_loader.next_batch(args.batch_size, 'train')
-        [encoder_word_input, encoder_character_input, decoder_input, target] = [Variable(t.from_numpy(var)) for var in
-                                                                                [encoder_word_input,
-                                                                                 encoder_character_input,
-                                                                                 decoder_input, target]]
-        input = [encoder_word_input.long(), encoder_character_input.long(), decoder_input.long(), target.float()]
+        input = batch_loader.next_batch(args.batch_size, 'train')
+
+        [encoder_word_input, encoder_character_input, decoder_word_input, decoder_character_input, target] = \
+            [Variable(t.from_numpy(var)) for var in input]
+
+        input = [encoder_word_input.long(), encoder_character_input.long(), decoder_word_input.long(),
+                 decoder_character_input.long(), target.float()]
         input = [var.cuda() if args.use_cuda else var for var in input]
-        [encoder_word_input, encoder_character_input, decoder_input, target] = input
+        [encoder_word_input, encoder_character_input, decoder_word_input, decoder_character_input, target] = input
 
-        [batch_size, seq_len] = decoder_input.size()
+        [batch_size, seq_len] = decoder_word_input.size()
 
-        logits, _, kld = rvae(args.dropout, encoder_word_input, encoder_character_input, decoder_input, z=None)
+        logits, _, kld = rvae(args.dropout,
+                              encoder_word_input, encoder_character_input,
+                              decoder_word_input, decoder_character_input,
+                              z=None)
 
         logits = logits.view(-1, parameters.word_vocab_size)
         prediction = F.softmax(logits)
@@ -87,33 +90,46 @@ if __name__ == "__main__":
 
         # SAMPLE
         if iteration % 20 == 0:
+
             seed = np.random.normal(size=[1, parameters.latent_variable_size])
             seed = Variable(t.from_numpy(seed).float())
             if args.use_cuda:
                 seed = seed.cuda()
 
-            decoder_input_np = batch_loader.fake_data(1)
-            decoder_input = Variable(t.from_numpy(decoder_input_np).long())
+            decoder_word_input_np, decoder_character_input_np = batch_loader.go_input(1)
+
+            decoder_word_input = Variable(t.from_numpy(decoder_word_input_np).long())
+            decoder_character_input = Variable(t.from_numpy(decoder_character_input_np).long())
+
             if args.use_cuda:
-                decoder_input = decoder_input.cuda()
+                decoder_word_input = decoder_word_input.cuda()
+                decoder_character_input = decoder_character_input.cuda()
 
             result = ''
 
-            for i in range(35):
-                logits, _, _ = rvae(0., None, None, decoder_input, seed)
+            initial_state = None
+
+            for i in range(50):
+                logits, initial_state, _ = rvae(0., None, None,
+                                                decoder_word_input, decoder_character_input,
+                                                seed, initial_state)
 
                 logits = logits.view(-1, parameters.word_vocab_size)
                 prediction = F.softmax(logits)
 
-                words = [batch_loader.sample_word_from_distribution(p) for p in [prediction.data.cpu().numpy()[-1]]]
+                word = batch_loader.sample_word_from_distribution(prediction.data.cpu().numpy()[-1])
 
-                result += ' ' + " ".join(words)
+                result += ' ' + word
 
-                words = [[batch_loader.word_to_idx[word] for word in words]]
-                decoder_input_np = np.append(decoder_input_np, words, 1)
-                decoder_input = Variable(t.from_numpy(decoder_input_np).long())
+                decoder_word_input_np = np.array([[batch_loader.word_to_idx[word]]])
+                decoder_character_input_np = np.array([[batch_loader.encode_characters(word)]])
+
+                decoder_word_input = Variable(t.from_numpy(decoder_word_input_np).long())
+                decoder_character_input = Variable(t.from_numpy(decoder_character_input_np).long())
+
                 if args.use_cuda:
-                    decoder_input = decoder_input.cuda()
+                    decoder_word_input = decoder_word_input.cuda()
+                    decoder_character_input = decoder_character_input.cuda()
 
             print('\n')
             print('------------SAMPLE------------')

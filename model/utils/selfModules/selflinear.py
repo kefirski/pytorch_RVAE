@@ -7,4 +7,4 @@ class self_Linear(nn.Linear):
 
     def reset_parameters(self):
         for weight in self.parameters():
-            weight.data.uniform_(-0.09, 0.09)
+            weight.data.uniform_(-0.1, 0.1)
