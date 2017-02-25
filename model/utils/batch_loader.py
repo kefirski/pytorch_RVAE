@@ -145,7 +145,7 @@ class BatchLoader:
     def build_character_vocab(self, data):
 
         # unique characters with blind symbol
-        chars = list(set(data)) + [self.blind_symbol, self.pad_token]
+        chars = list(set(data)) + [self.blind_symbol, self.pad_token, self.go_token, self.end_token]
         chars_vocab_size = len(chars)
 
         # mappings itself
