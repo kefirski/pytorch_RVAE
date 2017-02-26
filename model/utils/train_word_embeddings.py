@@ -53,4 +53,4 @@ if __name__ == '__main__':
             print('iteration = {}, loss = {}'.format(iteration, out))
 
     word_embeddings = neg_loss.input_embeddings()
-    np.save('data/word_embeddings.npy', word_embeddings)
+    np.save('../../data/word_embeddings.npy', word_embeddings)

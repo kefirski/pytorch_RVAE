@@ -1,13 +1,10 @@
-import numpy as np
 import torch as t
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
-from torch.nn import Parameter
 from decoder import Decoder
 from encoder import Encoder
 from utils.functional import *
-from utils.selfModules.selflinear import self_Linear
 from utils.selfModules.embedding import Embedding
 
 
@@ -21,14 +18,14 @@ class RVAE(nn.Module):
 
         self.encoder = Encoder(self.params)
 
-        self.context_to_mu = nn.Linear(self.params.encoder_rnn_size, self.params.latent_variable_size)
-        self.context_to_logvar = nn.Linear(self.params.encoder_rnn_size, self.params.latent_variable_size)
+        self.context_to_mu = nn.Linear(self.params.latent_variable_size, self.params.latent_variable_size)
+        self.context_to_logvar = nn.Linear(self.params.latent_variable_size, self.params.latent_variable_size)
 
         self.decoder = Decoder(self.params)
 
     def forward(self, drop_prob,
                 encoder_word_input=None, encoder_character_input=None,
-                decoder_word_input=None, decoder_character_input=None,
+                decoder_word_input=None,
                 z=None, initial_state=None):
         """
         :param encoder_word_input: An tensor with shape of [batch_size, seq_len] of Long type
@@ -51,10 +48,9 @@ class RVAE(nn.Module):
         use_cuda = self.embedding.word_embed.weight.is_cuda
 
         assert z is None and fold(lambda acc, parameter: acc and parameter is not None,
-                                  [encoder_word_input, encoder_character_input, decoder_word_input,
-                                   decoder_character_input],
+                                  [encoder_word_input, encoder_character_input, decoder_word_input],
                                   True) \
-               or (z is not None and decoder_word_input is not None), \
+            or (z is not None and decoder_word_input is not None), \
             "Ivalid input. If z is None then encoder and decoder inputs should be passed as arguments"
 
         if z is None:
@@ -80,7 +76,7 @@ class RVAE(nn.Module):
         else:
             kld = None
 
-        decoder_input = self.embedding(decoder_word_input, decoder_character_input)
+        decoder_input = self.embedding.word_embed(decoder_word_input)
         out, final_state = self.decoder(decoder_input, z, initial_state)
         return out, final_state, kld
 

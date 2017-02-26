@@ -20,7 +20,7 @@ if __name__ == "__main__":
                         help='num iterations (default: 40000)')
     parser.add_argument('--batch-size', type=int, default=22, metavar='BS',
                         help='batch size (default: 22)')
-    parser.add_argument('--use-cuda', type=bool, default=True, metavar='CUDA',
+    parser.add_argument('--use-cuda', type=bool, default=False, metavar='CUDA',
                         help='use cuda (default: True)')
     parser.add_argument('--learning-rate', type=float, default=0.0001, metavar='LR',
                         help='learning rate (default: 0.0001)')
@@ -45,19 +45,19 @@ if __name__ == "__main__":
         # TRAIN
         input = batch_loader.next_batch(args.batch_size, 'train')
 
-        [encoder_word_input, encoder_character_input, decoder_word_input, decoder_character_input, target] = \
+        [encoder_word_input, encoder_character_input, decoder_word_input, _,  target] = \
             [Variable(t.from_numpy(var)) for var in input]
 
-        input = [encoder_word_input.long(), encoder_character_input.long(), decoder_word_input.long(),
-                 decoder_character_input.long(), target.float()]
+        input = [encoder_word_input.long(), encoder_character_input.long(), decoder_word_input.long(), target.float()]
         input = [var.cuda() if args.use_cuda else var for var in input]
-        [encoder_word_input, encoder_character_input, decoder_word_input, decoder_character_input, target] = input
+
+        [encoder_word_input, encoder_character_input, decoder_word_input, target] = input
 
         [batch_size, seq_len] = decoder_word_input.size()
 
         logits, _, kld = rvae(args.dropout,
                               encoder_word_input, encoder_character_input,
-                              decoder_word_input, decoder_character_input,
+                              decoder_word_input,
                               z=None)
 
         logits = logits.view(-1, parameters.word_vocab_size)
@@ -96,14 +96,12 @@ if __name__ == "__main__":
             if args.use_cuda:
                 seed = seed.cuda()
 
-            decoder_word_input_np, decoder_character_input_np = batch_loader.go_input(1)
+            decoder_word_input_np = batch_loader.go_input(1)
 
             decoder_word_input = Variable(t.from_numpy(decoder_word_input_np).long())
-            decoder_character_input = Variable(t.from_numpy(decoder_character_input_np).long())
 
             if args.use_cuda:
                 decoder_word_input = decoder_word_input.cuda()
-                decoder_character_input = decoder_character_input.cuda()
 
             result = ''
 
@@ -111,7 +109,7 @@ if __name__ == "__main__":
 
             for i in range(50):
                 logits, initial_state, _ = rvae(0., None, None,
-                                                decoder_word_input, decoder_character_input,
+                                                decoder_word_input,
                                                 seed, initial_state)
 
                 logits = logits.view(-1, parameters.word_vocab_size)
@@ -125,11 +123,9 @@ if __name__ == "__main__":
                 decoder_character_input_np = np.array([[batch_loader.encode_characters(word)]])
 
                 decoder_word_input = Variable(t.from_numpy(decoder_word_input_np).long())
-                decoder_character_input = Variable(t.from_numpy(decoder_character_input_np).long())
 
                 if args.use_cuda:
                     decoder_word_input = decoder_word_input.cuda()
-                    decoder_character_input = decoder_character_input.cuda()
 
             print('\n')
             print('------------SAMPLE------------')
