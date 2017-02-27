@@ -36,6 +36,7 @@ class Decoder(nn.Module):
 
         [batch_size, seq_len, _] = decoder_input.size()
 
+        # decoder rnn is conditioned on context because of concat with it
         z = t.cat([z] * seq_len, 1).view(batch_size, seq_len, self.params.latent_variable_size)
         decoder_input = t.cat([decoder_input, z], 2)
 

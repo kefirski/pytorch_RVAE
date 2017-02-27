@@ -31,14 +31,13 @@ class RVAE(nn.Module):
         :param encoder_word_input: An tensor with shape of [batch_size, seq_len] of Long type
         :param encoder_character_input: An tensor with shape of [batch_size, seq_len, max_word_len] of Long type
         :param decoder_word_input: An tensor with shape of [batch_size, max_seq_len + 1] of Long type
-        :param decoder_character_input: An tensor with shape of [batch_size, max_seq_len + 1, max_word_len] of Long type
         :param initial_state: initial state of decoder rnn in order to perform sampling
 
         :param drop_prob: probability of an element of context to be zeroed in sence of dropout
 
         :param z: context if sampling is performing
 
-        :return: unnormalized logits of setnence words distribution probabilities
+        :return: unnormalized logits of sentence words distribution probabilities
                     with shape of [batch_size, seq_len, word_vocab_size]
                  final rnn state with shape of [num_layers, batch_size, decoder_rnn_size]
         """
@@ -51,9 +50,11 @@ class RVAE(nn.Module):
                                   [encoder_word_input, encoder_character_input, decoder_word_input],
                                   True) \
             or (z is not None and decoder_word_input is not None), \
-            "Ivalid input. If z is None then encoder and decoder inputs should be passed as arguments"
+            "Invalid input. If z is None then encoder and decoder inputs should be passed as arguments"
 
         if z is None:
+            """ Get context from encoder and sample z ~ N(mu, std * I)
+            """
             [batch_size, _] = encoder_word_input.size()
 
             encoder_input = self.embedding(encoder_word_input, encoder_character_input)

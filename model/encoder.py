@@ -4,6 +4,7 @@ import torch.nn.functional as F
 from utils.selfModules.highway import Highway
 from utils.functional import *
 
+
 class Encoder(nn.Module):
     def __init__(self, params):
         super(Encoder, self).__init__()
