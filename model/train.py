@@ -117,6 +117,9 @@ if __name__ == "__main__":
 
                 word = batch_loader.sample_word_from_distribution(prediction.data.cpu().numpy()[-1])
 
+                if word == batch_loader.end_token:
+                    break
+
                 result += ' ' + word
 
                 decoder_word_input_np = np.array([[batch_loader.word_to_idx[word]]])
