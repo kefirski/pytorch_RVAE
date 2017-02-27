@@ -37,7 +37,8 @@ class Encoder(nn.Module):
         assert parameters_allocation_check(self), \
             'Invalid CUDA options. Parameters should be allocated in the same memory'
 
-        # unfold rnn with zero initial state and get its final state from last layer
+        ''' Unfold rnn with zero initial state and get its final state from last layer
+        '''
         _, final_state = self.rnn(input)
 
         final_state = final_state.view(self.params.encoder_num_layers, 2, batch_size, self.params.encoder_rnn_size)

@@ -45,8 +45,10 @@ class Decoder(nn.Module):
             initial_state = F.tanh(self.context_to_state(initial_state))
             initial_state = initial_state.view(batch_size, self.params.decoder_num_layers,
                                                self.params.decoder_rnn_size)
+            initial_state = initial_state.transpose(0, 1).contiguous()
 
-        # decoder rnn is conditioned on context because of concat with it
+        ''' decoder rnn is conditioned on context via additional bias = W_cond * z to every input token
+        '''
         z = t.cat([z] * seq_len, 1).view(batch_size, seq_len, self.params.latent_variable_size)
         decoder_input = t.cat([decoder_input, z], 2)
 

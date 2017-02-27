@@ -20,7 +20,7 @@ if __name__ == "__main__":
                         help='num iterations (default: 40000)')
     parser.add_argument('--batch-size', type=int, default=22, metavar='BS',
                         help='batch size (default: 22)')
-    parser.add_argument('--use-cuda', type=bool, default=True, metavar='CUDA',
+    parser.add_argument('--use-cuda', type=bool, default=False, metavar='CUDA',
                         help='use cuda (default: True)')
     parser.add_argument('--learning-rate', type=float, default=0.0001, metavar='LR',
                         help='learning rate (default: 0.0001)')
@@ -64,7 +64,8 @@ if __name__ == "__main__":
         prediction = F.softmax(logits)
         target = target.view(-1, parameters.word_vocab_size)
 
-        # firsly NLL loss estimated, then summed over sequence to emit [batch_size] shaped BCE
+        ''' NLL loss estimated, then summed over sequence to emit [batch_size] shaped BCE
+        '''
         bce = (prediction.log() * target) \
             .view(batch_size, seq_len, parameters.word_vocab_size) \
             .sum(2).neg().sum(1).squeeze()

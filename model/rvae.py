@@ -53,8 +53,8 @@ class RVAE(nn.Module):
             "Invalid input. If z is None then encoder and decoder inputs should be passed as arguments"
 
         if z is None:
-            """ Get context from encoder and sample z ~ N(mu, std * I)
-            """
+            ''' Get context from encoder and sample z ~ N(mu, std * I)
+            '''
             [batch_size, _] = encoder_word_input.size()
 
             encoder_input = self.embedding(encoder_word_input, encoder_character_input)
