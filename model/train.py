@@ -96,7 +96,7 @@ if __name__ == "__main__":
             if args.use_cuda:
                 seed = seed.cuda()
 
-            decoder_word_input_np = batch_loader.go_input(1)
+            decoder_word_input_np, _ = batch_loader.go_input(1)
 
             decoder_word_input = Variable(t.from_numpy(decoder_word_input_np).long())
 

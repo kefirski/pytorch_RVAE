@@ -1,8 +1,8 @@
+import torch as t
 import torch.nn as nn
 import torch.nn.functional as F
 from utils.selfModules.highway import Highway
 from utils.functional import *
-from utils.selfModules.selflinear import self_Linear
 
 
 class Decoder(nn.Module):
@@ -11,12 +11,7 @@ class Decoder(nn.Module):
 
         self.params = params
 
-        self.hw1 = Highway(self.params.latent_variable_size, 3, F.relu)
-
-        self.context_to_state = nn.Linear(self.params.latent_variable_size,
-                                            self.params.decoder_rnn_size * self.params.decoder_num_layers)
-
-        self.rnn = nn.GRU(input_size=self.params.word_embed_size,
+        self.rnn = nn.GRU(input_size=self.params.word_embed_size + self.params.latent_variable_size,
                           hidden_size=self.params.decoder_rnn_size,
                           num_layers=self.params.decoder_num_layers,
                           batch_first=True)
@@ -41,14 +36,8 @@ class Decoder(nn.Module):
 
         [batch_size, seq_len, _] = decoder_input.size()
 
-        if initial_state is None:
-
-            initial_state = self.hw1(z)
-            initial_state = F.tanh(self.context_to_state(initial_state))
-            initial_state = initial_state.view(batch_size, self.params.decoder_num_layers, self.params.decoder_rnn_size)
-
-            # for now initial_state is tensor with shape of [num_layers, batch_size, decoder_rnn_size]
-            initial_state = initial_state.transpose(0, 1).contiguous()
+        z = t.cat([z] * seq_len, 1).view(batch_size, seq_len, self.params.latent_variable_size)
+        decoder_input = t.cat([decoder_input, z], 2)
 
         rnn_out, final_state = self.rnn(decoder_input, initial_state)
         rnn_out = rnn_out.contiguous().view(-1, self.params.decoder_rnn_size)
