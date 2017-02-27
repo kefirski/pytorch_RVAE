@@ -11,6 +11,10 @@ class Decoder(nn.Module):
 
         self.params = params
 
+        self.hw1 = Highway(self.params.latent_variable_size, 3, F.relu)
+        self.context_to_state = nn.Linear(self.params.latent_variable_size,
+                                          self.params.decoder_rnn_size * self.params.decoder_num_layers)
+
         self.rnn = nn.GRU(input_size=self.params.word_embed_size + self.params.latent_variable_size,
                           hidden_size=self.params.decoder_rnn_size,
                           num_layers=self.params.decoder_num_layers,
@@ -35,6 +39,12 @@ class Decoder(nn.Module):
             'Invalid CUDA options. Parameters should be allocated in the same memory'
 
         [batch_size, seq_len, _] = decoder_input.size()
+
+        if initial_state is None:
+            initial_state = self.hw1(z)
+            initial_state = F.tanh(self.context_to_state(initial_state))
+            initial_state = initial_state.view(batch_size, self.params.decoder_num_layers,
+                                               self.params.decoder_rnn_size)
 
         # decoder rnn is conditioned on context because of concat with it
         z = t.cat([z] * seq_len, 1).view(batch_size, seq_len, self.params.latent_variable_size)

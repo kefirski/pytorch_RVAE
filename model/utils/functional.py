@@ -11,8 +11,8 @@ def f_or(x, y):
 
 
 def parameters_allocation_check(module):
-    parmeters = list(module.parameters())
-    return fold(f_and, parmeters, True) or not fold(f_or, parmeters, False)
+    parameters = list(module.parameters())
+    return fold(f_and, parameters, True) or not fold(f_or, parameters, False)
 
 
 def handle_inputs(inputs, use_cuda):
@@ -27,4 +27,4 @@ def handle_inputs(inputs, use_cuda):
 
 def kld_coef(i):
     import math
-    return math.tanh(i / 1200)
+    return math.tanh(i / 4000)
