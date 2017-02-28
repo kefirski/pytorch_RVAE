@@ -74,14 +74,15 @@ class RVAE(nn.Module):
 
             kld = -0.5 * t.sum(logvar - t.pow(mu, 2) - t.exp(logvar) + 1, 1).squeeze()
 
-            z = F.dropout(z, p=drop_prob, training=True)
+            # z = F.dropout(z, p=drop_prob, training=True)
         else:
             kld = None
 
         decoder_input = self.embedding.word_embed(decoder_word_input)
+        decoder_input = F.dropout(decoder_input, drop_prob)
         out, final_state = self.decoder(decoder_input, z, initial_state)
         return out, final_state, kld
 
     def learnable_paramters(self):
-        # word_enbedding is constant parameter thus it must be dropped from list of parameters for optimizer
+        # word_embedding is constant parameter thus it must be dropped from list of parameters for optimizer
         return [p for p in self.parameters() if p.requires_grad]

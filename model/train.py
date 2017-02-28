@@ -18,7 +18,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='RVAE')
     parser.add_argument('--num-iterations', type=int, default=40000, metavar='NI',
                         help='num iterations (default: 40000)')
-    parser.add_argument('--batch-size', type=int, default=22, metavar='BS',
+    parser.add_argument('--batch-size', type=int, default=30, metavar='BS',
                         help='batch size (default: 22)')
     parser.add_argument('--use-cuda', type=bool, default=True, metavar='CUDA',
                         help='use cuda (default: True)')
