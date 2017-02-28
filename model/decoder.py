@@ -27,7 +27,7 @@ class Decoder(nn.Module):
     def forward(self, decoder_input, z, initial_state=None):
         """
         :param decoder_input: tensor with shape of [batch_size, seq_len, embed_size]
-        :param z: sequence context with shape of [batch_size, latent_vatiable_size]
+        :param z: sequence context with shape of [batch_size, latent_variable_size]
         :param initial_state: initial state of decoder rnn
 
         :return: unnormalized logits of setnence words distribution probabilities

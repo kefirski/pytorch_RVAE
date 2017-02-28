@@ -33,7 +33,7 @@ class RVAE(nn.Module):
         :param decoder_word_input: An tensor with shape of [batch_size, max_seq_len + 1] of Long type
         :param initial_state: initial state of decoder rnn in order to perform sampling
 
-        :param drop_prob: probability of an element of context to be zeroed in sence of dropout
+        :param drop_prob: probability of an element of context to be zeroed in sense of dropout
 
         :param z: context if sampling is performing
 
@@ -53,7 +53,7 @@ class RVAE(nn.Module):
             "Invalid input. If z is None then encoder and decoder inputs should be passed as arguments"
 
         if z is None:
-            ''' Get context from encoder and sample z ~ N(mu, std * I)
+            ''' Get context from encoder and sample z ~ N(mu, std)
             '''
             [batch_size, _] = encoder_word_input.size()
 

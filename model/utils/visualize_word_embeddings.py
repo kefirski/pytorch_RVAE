@@ -8,7 +8,7 @@ from utils.batch_loader import BatchLoader
 
 if __name__ == "__main__":
     if not os.path.exists('../../data/word_embeddings.npy'):
-        raise FileNotFoundError("word embdeddings file was't found")
+        raise FileNotFoundError("word embeddings file was't found")
 
     pca = PCA(n_components=2)
     word_embeddings = np.load('../../data/word_embeddings.npy')
