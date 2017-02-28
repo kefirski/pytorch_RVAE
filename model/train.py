@@ -4,7 +4,7 @@ import numpy as np
 import torch as t
 import torch.nn.functional as F
 from torch.autograd import Variable
-from torch.optim import SGD
+from torch.optim import Adam
 from rvae import RVAE
 from utils.batch_loader import BatchLoader
 from utils.functional import kld_coef
@@ -18,7 +18,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='RVAE')
     parser.add_argument('--num-iterations', type=int, default=40000, metavar='NI',
                         help='num iterations (default: 40000)')
-    parser.add_argument('--batch-size', type=int, default=30, metavar='BS',
+    parser.add_argument('--batch-size', type=int, default=22, metavar='BS',
                         help='batch size (default: 22)')
     parser.add_argument('--use-cuda', type=bool, default=True, metavar='CUDA',
                         help='use cuda (default: True)')
@@ -39,7 +39,7 @@ if __name__ == "__main__":
     if args.use_cuda:
         rvae = rvae.cuda()
 
-    optimizer = SGD(rvae.learnable_paramters(), args.learning_rate)
+    optimizer = Adam(rvae.learnable_paramters(), args.learning_rate)
 
     for iteration in range(args.num_iterations):
         # TRAIN
@@ -64,13 +64,9 @@ if __name__ == "__main__":
         prediction = F.softmax(logits)
         target = target.view(-1, parameters.word_vocab_size)
 
-        ''' NLL loss estimated, then summed over sequence to emit [batch_size] shaped BCE
-        '''
-        bce = (prediction.log() * target) \
-            .view(batch_size, seq_len, parameters.word_vocab_size) \
-            .sum(2).neg().sum(1).squeeze()
+        bce = F.binary_cross_entropy(logits, target, size_average=False)
 
-        loss = (bce + kld_coef(iteration) * kld).mean()
+        loss = (bce + kld_coef(iteration) * kld)/batch_size
 
         optimizer.zero_grad()
         loss.backward()

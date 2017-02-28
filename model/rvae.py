@@ -72,9 +72,10 @@ class RVAE(nn.Module):
 
             z = z * std + mu
 
-            kld = -0.5 * t.sum(logvar - t.pow(mu, 2) - t.exp(logvar) + 1, 1).squeeze()
+            kld = (-0.5 * t.sum(logvar - t.pow(mu, 2) - t.exp(logvar) + 1, 1)).sum().squeeze()
 
             # z = F.dropout(z, p=drop_prob, training=True)
+
         else:
             kld = None
 

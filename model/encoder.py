@@ -29,11 +29,11 @@ class Encoder(nn.Module):
         :return: context of input sentenses with shape of [batch_size, latent_variable_size]
         """
 
-        [batch_size, seq_len, _] = input.size()
+        [batch_size, seq_len, embed_size] = input.size()
 
-        input = input.view(-1, self.params.sum_depth + self.params.word_embed_size)
+        input = input.view(-1, embed_size)
         input = self.hw1(input)
-        input = input.view(batch_size, seq_len, self.params.sum_depth + self.params.word_embed_size)
+        input = input.view(batch_size, seq_len, embed_size)
 
         assert parameters_allocation_check(self), \
             'Invalid CUDA options. Parameters should be allocated in the same memory'
