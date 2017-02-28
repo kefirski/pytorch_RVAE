@@ -64,7 +64,7 @@ if __name__ == "__main__":
         prediction = F.softmax(logits)
         target = target.view(-1, parameters.word_vocab_size)
 
-        bce = F.binary_cross_entropy(logits, target, size_average=False)
+        bce = F.binary_cross_entropy(prediction, target, size_average=False)
 
         loss = (bce + kld_coef(iteration) * kld)/batch_size
 
