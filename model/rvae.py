@@ -6,6 +6,7 @@ from decoder import Decoder
 from encoder import Encoder
 from utils.functional import *
 from utils.selfModules.embedding import Embedding
+from utils.selfModules.selflinear import self_Linear
 
 
 class RVAE(nn.Module):
@@ -18,8 +19,8 @@ class RVAE(nn.Module):
 
         self.encoder = Encoder(self.params)
 
-        self.context_to_mu = nn.Linear(self.params.latent_variable_size, self.params.latent_variable_size)
-        self.context_to_logvar = nn.Linear(self.params.latent_variable_size, self.params.latent_variable_size)
+        self.context_to_mu = self_Linear(self.params.latent_variable_size, self.params.latent_variable_size)
+        self.context_to_logvar = self_Linear(self.params.latent_variable_size, self.params.latent_variable_size)
 
         self.decoder = Decoder(self.params)
 
