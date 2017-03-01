@@ -16,16 +16,18 @@ if __name__ == "__main__":
         raise FileNotFoundError("word embdeddings file was't found")
 
     parser = argparse.ArgumentParser(description='RVAE')
-    parser.add_argument('--num-iterations', type=int, default=40000, metavar='NI',
+    parser.add_argument('--num-iterations', type=int, default=1, metavar='NI',
                         help='num iterations (default: 40000)')
     parser.add_argument('--batch-size', type=int, default=22, metavar='BS',
                         help='batch size (default: 22)')
-    parser.add_argument('--use-cuda', type=bool, default=False, metavar='CUDA',
+    parser.add_argument('--use-cuda', type=bool, default=True, metavar='CUDA',
                         help='use cuda (default: True)')
     parser.add_argument('--learning-rate', type=float, default=0.00005, metavar='LR',
                         help='learning rate (default: 0.00005)')
     parser.add_argument('--dropout', type=float, default=0.3, metavar='DR',
                         help='dropout (default: 0.3)')
+    parser.add_argument('--use-trained', type=bool, default=False, metavar='UT',
+                        help='load pretrained model (default: False)')
 
     args = parser.parse_args()
 
@@ -36,6 +38,8 @@ if __name__ == "__main__":
                             batch_loader.chars_vocab_size)
 
     rvae = RVAE(parameters)
+    if args.use_trained:
+        rvae.load_state_dict(t.load('trained_RVAE'))
     if args.use_cuda:
         rvae = rvae.cuda()
 
@@ -51,3 +55,5 @@ if __name__ == "__main__":
             seed = np.random.normal(size=[1, parameters.latent_variable_size])
 
             rvae.sample(batch_loader, 50, seed, args.use_cuda)
+
+    t.save(rvae.state_dict(), 'trained_RVAE')
