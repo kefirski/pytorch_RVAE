@@ -2,12 +2,9 @@ import argparse
 import os
 import numpy as np
 import torch as t
-import torch.nn.functional as F
-from torch.autograd import Variable
 from torch.optim import Adam
 from rvae import RVAE
 from utils.batch_loader import BatchLoader
-from utils.functional import kld_coef
 from utils.parameters import Parameters
 
 if __name__ == "__main__":
