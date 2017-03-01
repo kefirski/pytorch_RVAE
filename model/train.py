@@ -20,7 +20,7 @@ if __name__ == "__main__":
                         help='num iterations (default: 40000)')
     parser.add_argument('--batch-size', type=int, default=22, metavar='BS',
                         help='batch size (default: 22)')
-    parser.add_argument('--use-cuda', type=bool, default=True, metavar='CUDA',
+    parser.add_argument('--use-cuda', type=bool, default=False, metavar='CUDA',
                         help='use cuda (default: True)')
     parser.add_argument('--learning-rate', type=float, default=0.00005, metavar='LR',
                         help='learning rate (default: 0.00005)')
@@ -41,94 +41,13 @@ if __name__ == "__main__":
 
     optimizer = Adam(rvae.learnable_paramters(), args.learning_rate)
 
+    train_step = rvae.trainer(optimizer, batch_loader)
+
     for iteration in range(args.num_iterations):
-        # TRAIN
-        input = batch_loader.next_batch(args.batch_size, 'train')
 
-        [encoder_word_input, encoder_character_input, decoder_word_input, _,  target] = \
-            [Variable(t.from_numpy(var)) for var in input]
+        train_step(iteration, args.batch_size, args.use_cuda, args.dropout)
 
-        input = [encoder_word_input.long(), encoder_character_input.long(), decoder_word_input.long(), target.float()]
-        input = [var.cuda() if args.use_cuda else var for var in input]
-
-        [encoder_word_input, encoder_character_input, decoder_word_input, target] = input
-
-        [batch_size, seq_len] = decoder_word_input.size()
-
-        logits, _, kld = rvae(args.dropout,
-                              encoder_word_input, encoder_character_input,
-                              decoder_word_input,
-                              z=None)
-
-        logits = logits.view(-1, parameters.word_vocab_size)
-        prediction = F.softmax(logits)
-        target = target.view(-1, parameters.word_vocab_size)
-
-        bce = F.binary_cross_entropy(prediction, target, size_average=False)
-
-        loss = (bce + kld_coef(iteration) * kld)/batch_size
-
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-
-        if iteration % 5 == 0:
-            print('\n')
-            print('------------TRAIN-------------')
-            print('----------ITERATION-----------')
-            print(iteration)
-            print('-------------BCE--------------')
-            print(bce.mean().data.cpu().numpy()[0])
-            print('-------------KLD--------------')
-            print(kld.mean().data.cpu().numpy()[0])
-            print('-----------KLD-coef-----------')
-            print(kld_coef(iteration))
-            print('------------------------------')
-
-        # SAMPLE
         if iteration % 20 == 0:
-
             seed = np.random.normal(size=[1, parameters.latent_variable_size])
-            seed = Variable(t.from_numpy(seed).float())
-            if args.use_cuda:
-                seed = seed.cuda()
 
-            decoder_word_input_np, _ = batch_loader.go_input(1)
-
-            decoder_word_input = Variable(t.from_numpy(decoder_word_input_np).long())
-
-            if args.use_cuda:
-                decoder_word_input = decoder_word_input.cuda()
-
-            result = ''
-
-            initial_state = None
-
-            for i in range(50):
-                logits, initial_state, _ = rvae(0., None, None,
-                                                decoder_word_input,
-                                                seed, initial_state)
-
-                logits = logits.view(-1, parameters.word_vocab_size)
-                prediction = F.softmax(logits)
-
-                word = batch_loader.sample_word_from_distribution(prediction.data.cpu().numpy()[-1])
-
-                if word == batch_loader.end_token:
-                    break
-
-                result += ' ' + word
-
-                decoder_word_input_np = np.array([[batch_loader.word_to_idx[word]]])
-                decoder_character_input_np = np.array([[batch_loader.encode_characters(word)]])
-
-                decoder_word_input = Variable(t.from_numpy(decoder_word_input_np).long())
-
-                if args.use_cuda:
-                    decoder_word_input = decoder_word_input.cuda()
-
-            print('\n')
-            print('------------SAMPLE------------')
-            print('------------------------------')
-            print(result)
-            print('------------------------------')
+            rvae.sample(batch_loader, 50, seed, args.use_cuda)

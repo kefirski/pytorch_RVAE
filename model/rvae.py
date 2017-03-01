@@ -7,6 +7,7 @@ from encoder import Encoder
 from utils.functional import *
 from utils.selfModules.embedding import Embedding
 from utils.selfModules.selflinear import self_Linear
+import numpy as np
 
 
 class RVAE(nn.Module):
@@ -87,3 +88,96 @@ class RVAE(nn.Module):
     def learnable_paramters(self):
         # word_embedding is constant parameter thus it must be dropped from list of parameters for optimizer
         return [p for p in self.parameters() if p.requires_grad]
+
+    def trainer(self, optimizer, batch_loader):
+        def train(i, batch_size, use_cuda, dropout):
+
+            input = batch_loader.next_batch(batch_size, 'train')
+
+            [encoder_word_input, encoder_character_input, decoder_word_input, _, target] = \
+                [Variable(t.from_numpy(var)) for var in input]
+
+            input = [encoder_word_input.long(), encoder_character_input.long(), decoder_word_input.long(),
+                     target.float()]
+            input = [var.cuda() if use_cuda else var for var in input]
+
+            [encoder_word_input, encoder_character_input, decoder_word_input, target] = input
+
+            [batch_size, seq_len] = decoder_word_input.size()
+
+            logits, _, kld = self(dropout,
+                                  encoder_word_input, encoder_character_input,
+                                  decoder_word_input,
+                                  z=None)
+
+            logits = logits.view(-1, self.params.word_vocab_size)
+            prediction = F.softmax(logits)
+            target = target.view(-1, self.params.word_vocab_size)
+
+            bce = F.binary_cross_entropy(prediction, target, size_average=False)
+
+            loss = (bce + kld_coef(i) * kld) / batch_size
+
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+            if i % 5 == 0:
+                print('\n')
+                print('------------TRAIN-------------')
+                print('----------ITERATION-----------')
+                print(i)
+                print('-------------BCE--------------')
+                print(bce.mean().data.cpu().numpy()[0])
+                print('-------------KLD--------------')
+                print(kld.mean().data.cpu().numpy()[0])
+                print('-----------KLD-coef-----------')
+                print(kld_coef(i))
+                print('------------------------------')
+
+        return train
+
+    def sample(self, batch_loader, seq_len, seed, use_cuda):
+        seed = Variable(t.from_numpy(seed).float())
+        if use_cuda:
+            seed = seed.cuda()
+
+        decoder_word_input_np, _ = batch_loader.go_input(1)
+
+        decoder_word_input = Variable(t.from_numpy(decoder_word_input_np).long())
+
+        if use_cuda:
+            decoder_word_input = decoder_word_input.cuda()
+
+        result = ''
+
+        initial_state = None
+
+        for i in range(seq_len):
+            logits, initial_state, _ = self(0., None, None,
+                                            decoder_word_input,
+                                            seed, initial_state)
+
+            logits = logits.view(-1, self.params.word_vocab_size)
+            prediction = F.softmax(logits)
+
+            word = batch_loader.sample_word_from_distribution(prediction.data.cpu().numpy()[-1])
+
+            if word == batch_loader.end_token:
+                break
+
+            result += ' ' + word
+
+            decoder_word_input_np = np.array([[batch_loader.word_to_idx[word]]])
+
+            decoder_word_input = Variable(t.from_numpy(decoder_word_input_np).long())
+
+            if use_cuda:
+                decoder_word_input = decoder_word_input.cuda()
+
+        print('\n')
+        print('------------SAMPLE------------')
+        print('------------------------------')
+        print(result)
+        print('------------------------------')
+
