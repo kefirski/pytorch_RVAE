@@ -1,5 +1,5 @@
-## pytorch Recurrent Variational Autoencoder
-Generates sequential data
+# Pytorch Recurrent Variational Autoencoder 
+## Generates sequential data
 
 ### Sampling examples:
 - > the new machine could be used to increase the number of ventures block in the company 's \<unk> shopping system to finance diversified organizations
@@ -10,6 +10,7 @@ Generates sequential data
 
 - > the companies insisted that the color set could be included in the program
 
+# Usage
 ### Before model training it is neccesary to train word embeddings:
 ```
 cd model/utils
