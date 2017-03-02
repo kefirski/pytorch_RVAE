@@ -46,11 +46,30 @@ if __name__ == "__main__":
 
     for iteration in range(args.num_iterations):
 
-        train_step(iteration, args.batch_size, args.use_cuda, args.dropout)
+        bce, kld, coef = train_step(iteration, args.batch_size, args.use_cuda, args.dropout)
+
+        if iteration % 5 == 0:
+            print('\n')
+            print('------------TRAIN-------------')
+            print('----------ITERATION-----------')
+            print(iteration)
+            print('-------------BCE--------------')
+            print(bce.mean().data.cpu().numpy()[0])
+            print('-------------KLD--------------')
+            print(kld.mean().data.cpu().numpy()[0])
+            print('-----------KLD-coef-----------')
+            print(coef)
+            print('------------------------------')
 
         if iteration % 20 == 0:
             seed = np.random.normal(size=[1, parameters.latent_variable_size])
 
-            rvae.sample(batch_loader, 50, seed, args.use_cuda)
+            sample = rvae.sample(batch_loader, 50, seed, args.use_cuda)
+
+            print('\n')
+            print('------------SAMPLE------------')
+            print('------------------------------')
+            print(sample)
+            print('------------------------------')
 
     t.save(rvae.state_dict(), 'trained_RVAE')

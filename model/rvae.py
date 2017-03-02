@@ -103,7 +103,7 @@ class RVAE(nn.Module):
 
             [encoder_word_input, encoder_character_input, decoder_word_input, target] = input
 
-            [batch_size, seq_len] = decoder_word_input.size()
+            [batch_size, _] = decoder_word_input.size()
 
             logits, _, kld = self(dropout,
                                   encoder_word_input, encoder_character_input,
@@ -122,18 +122,7 @@ class RVAE(nn.Module):
             loss.backward()
             optimizer.step()
 
-            if i % 5 == 0:
-                print('\n')
-                print('------------TRAIN-------------')
-                print('----------ITERATION-----------')
-                print(i)
-                print('-------------BCE--------------')
-                print(bce.mean().data.cpu().numpy()[0])
-                print('-------------KLD--------------')
-                print(kld.mean().data.cpu().numpy()[0])
-                print('-----------KLD-coef-----------')
-                print(kld_coef(i))
-                print('------------------------------')
+            return bce, kld, kld_coef(i)
 
         return train
 
@@ -175,9 +164,5 @@ class RVAE(nn.Module):
             if use_cuda:
                 decoder_word_input = decoder_word_input.cuda()
 
-        print('\n')
-        print('------------SAMPLE------------')
-        print('------------------------------')
-        print(result)
-        print('------------------------------')
+        return result
 
