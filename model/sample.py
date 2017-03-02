@@ -27,11 +27,12 @@ if __name__ == '__main__':
                             batch_loader.chars_vocab_size)
 
     rvae = RVAE(parameters)
-    if args.use_trained:
-        rvae.load_state_dict(t.load('trained_RVAE'))
+    rvae.load_state_dict(t.load('trained_RVAE'))
     if args.use_cuda:
         rvae = rvae.cuda()
 
     for iteration in range(args.num_sample):
         seed = np.random.normal(size=[1, parameters.latent_variable_size])
-        rvae.sample(batch_loader, 50, seed, args.use_cuda)
+        result = rvae.sample(batch_loader, 50, seed, args.use_cuda)
+        print(result)
+        print()

@@ -23,7 +23,7 @@ if __name__ == "__main__":
                         help='learning rate (default: 0.00005)')
     parser.add_argument('--dropout', type=float, default=0.3, metavar='DR',
                         help='dropout (default: 0.3)')
-    parser.add_argument('--use-trained', type=bool, default=False, metavar='UT',
+    parser.add_argument('--use-trained', type=bool, default=True, metavar='UT',
                         help='load pretrained model (default: False)')
 
     args = parser.parse_args()
