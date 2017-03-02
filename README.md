@@ -26,7 +26,7 @@ $ cd model
 $ python train.py
 ```
 
-### To sample data after training use
+### To sample data after training use:
 ```
 $ cd model
 $ python sample.py
