@@ -1,7 +1,10 @@
 # Pytorch Recurrent Variational Autoencoder 
-## Generates sequential data
 
-### Sampling examples:
+## Model:
+This is the implementation of Samuel Bowman's [Generating Sentences from a Continuous Space] (https://arxiv.org/abs/1511.06349#)
+with Kim's [Character-Aware Neural Language Models](https://arxiv.org/abs/1508.06615) embedding for tokens
+
+## Sampling examples:
 - > the new machine could be used to increase the number of ventures block in the company 's \<unk> shopping system to finance diversified organizations
 
 - > u.s. government officials also said they would be willing to consider whether the proposal could be used as urging and programs
@@ -10,7 +13,7 @@
 
 - > the companies insisted that the color set could be included in the program
 
-# Usage
+## Usage
 ### Before model training it is neccesary to train word embeddings:
 ```
 cd model/utils
