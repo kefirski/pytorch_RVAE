@@ -16,12 +16,12 @@ with Kim's [Character-Aware Neural Language Models](https://arxiv.org/abs/1508.0
 ## Usage
 ### Before model training it is neccesary to train word embeddings:
 ```
-cd model/utils
-python train_word_embeddings.py
+$ cd model/utils
+$ python train_word_embeddings.py
 ```
 
 ### To train model use:
 ```
-cd model
-python train.py
+$ cd model
+$ python train.py
 ```
