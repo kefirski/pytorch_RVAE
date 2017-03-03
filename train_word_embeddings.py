@@ -5,9 +5,9 @@ import torch as t
 from torch.autograd import Variable
 from torch.optim import SGD
 
-from selfModules.neg import NEG_loss
 from utils.batch_loader import BatchLoader
 from utils.parameters import Parameters
+from selfModules.neg import NEG_loss
 
 if __name__ == '__main__':
 
@@ -22,7 +22,7 @@ if __name__ == '__main__':
                         help='use cuda (default: True)')
     args = parser.parse_args()
 
-    batch_loader = BatchLoader()
+    batch_loader = BatchLoader('')
     params = Parameters(batch_loader.max_word_len,
                         batch_loader.max_seq_len,
                         batch_loader.words_vocab_size,

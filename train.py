@@ -5,10 +5,9 @@ import numpy as np
 import torch as t
 from torch.optim import Adam
 
-from rvae import RVAE
-
 from utils.batch_loader import BatchLoader
 from utils.parameters import Parameters
+from model.rvae import RVAE
 
 if __name__ == "__main__":
 
@@ -31,7 +30,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    batch_loader = BatchLoader('../')
+    batch_loader = BatchLoader('')
     parameters = Parameters(batch_loader.max_word_len,
                             batch_loader.max_seq_len,
                             batch_loader.words_vocab_size,

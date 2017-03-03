@@ -3,7 +3,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from selfModules.highway import Highway
-from utils.functional import *
 
 
 class Decoder(nn.Module):

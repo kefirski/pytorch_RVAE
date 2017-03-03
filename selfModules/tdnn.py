@@ -20,7 +20,7 @@ class TDNN(nn.Module):
 
         :return: tensor with shape [batch_size, max_seq_len, depth_sum]
 
-        :descr: applies multikenrel 1d-conv layer along every word in input with max-over-time pooling
+        applies multikenrel 1d-conv layer along every word in input with max-over-time pooling
             to emit fixed-size output
         """
 
@@ -35,7 +35,7 @@ class TDNN(nn.Module):
         assert embed_size == self.params.char_embed_size, \
             'Wrong embedding size, must be equal to {}, but {} found'.format(self.params.char_embed_size, embed_size)
 
-        # some leaps with shape
+        # leaps with shape
         x = x.view(-1, self.params.max_word_len, self.params.char_embed_size).transpose(1, 2).contiguous()
 
         xs = [F.relu(F.conv1d(x, kernel)) for kernel in self.kernels]

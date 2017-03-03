@@ -3,13 +3,12 @@ import torch as t
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
+
+from .decoder import Decoder
+from .encoder import Encoder
+
 from selfModules.embedding import Embedding
 from selfModules.selflinear import self_Linear
-
-from decoder import Decoder
-from encoder import Encoder
-
-from utils.functional import *
 
 
 class RVAE(nn.Module):

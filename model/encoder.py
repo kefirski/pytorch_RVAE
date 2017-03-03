@@ -4,7 +4,6 @@ import torch.nn.functional as F
 
 from selfModules.highway import Highway
 from selfModules.selflstm import self_LSTM
-from utils.functional import *
 
 
 class Encoder(nn.Module):
