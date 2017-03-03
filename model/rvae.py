@@ -10,6 +10,8 @@ from .encoder import Encoder
 from selfModules.embedding import Embedding
 from selfModules.selflinear import self_Linear
 
+from utils.functional import kld_coef, parameters_allocation_check, fold
+
 
 class RVAE(nn.Module):
     def __init__(self, params):
@@ -108,10 +110,11 @@ class RVAE(nn.Module):
                                   z=None)
 
             logits = logits.view(-1, self.params.word_vocab_size)
-            target = target.view(-1)
+            prediction = F.softmax(logits)
+            target = target.view(-1, self.params.word_vocab_size)
 
-            # bce is averaged over seq_len before sum with kld
-            bce = F.cross_entropy(logits, target, size_average=False)/seq_len
+            bce = F.binary_cross_entropy(prediction, target, size_average=False)/seq_len
+
             loss = (bce + kld_coef(i) * kld) / batch_size
 
             optimizer.zero_grad()
