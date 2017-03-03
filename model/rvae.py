@@ -114,10 +114,11 @@ class RVAE(nn.Module):
                                   z=None)
 
             logits = logits.view(-1, self.params.word_vocab_size)
-            prediction = F.softmax(logits)
-            target = target.view(-1, self.params.word_vocab_size)
+            # prediction = F.softmax(logits)
+            # target = target.view(-1, self.params.word_vocab_size)
+            target = target.view(-1)
 
-            bce = F.binary_cross_entropy(prediction, target, size_average=False)/seq_len
+            bce = F.cross_entropy(logits, target, size_average=False)
 
             loss = (bce + kld_coef(i) * kld) / batch_size
 
