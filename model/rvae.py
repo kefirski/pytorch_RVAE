@@ -78,7 +78,6 @@ class RVAE(nn.Module):
 
             kld = (-0.5 * t.sum(logvar - t.pow(mu, 2) - t.exp(logvar) + 1, 1)).sum().squeeze()
 
-            # z = F.dropout(z, p=drop_prob, training=True)
 
         else:
             kld = None
@@ -86,6 +85,7 @@ class RVAE(nn.Module):
         decoder_input = self.embedding.word_embed(decoder_word_input)
         decoder_input = F.dropout(decoder_input, drop_prob)
         out, final_state = self.decoder(decoder_input, z, initial_state)
+
         return out, final_state, kld
 
     def learnable_paramters(self):
@@ -110,8 +110,6 @@ class RVAE(nn.Module):
                                   z=None)
 
             logits = logits.view(-1, self.params.word_vocab_size)
-            # prediction = F.softmax(logits)
-            # target = target.view(-1, self.params.word_vocab_size)
             target = target.view(-1)
 
             bce = F.cross_entropy(logits, target, size_average=False)

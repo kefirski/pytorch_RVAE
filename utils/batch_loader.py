@@ -119,10 +119,10 @@ class BatchLoader:
         return string.lower()
 
     def clean_str(self, string):
-        """
+        '''
             Tokenization/string cleaning for all datasets except for SST.
             Original taken from https://github.com/yoonkim/CNN_sentence/blob/master/process_data
-        """
+        '''
 
         string = re.sub(r"[^가-힣A-Za-z0-9(),!?:;.\'\`]", " ", string)
         string = re.sub(r"\'s", " \'s", string)
@@ -237,7 +237,6 @@ class BatchLoader:
 
         encoded_words = [[idx for idx in line] for line in encoder_word_input]
         decoder_word_input = [[self.word_to_idx[self.go_token]] + line for line in encoder_word_input]
-        # decoder_character_input = [[self.encode_characters(self.go_token)] + line for line in encoder_character_input]
         decoder_output = [line + [self.word_to_idx[self.end_token]] for line in encoded_words]
 
         # sorry
@@ -245,11 +244,6 @@ class BatchLoader:
             line_len = input_seq_len[i]
             to_add = self.max_seq_len - line_len
             decoder_word_input[i] = line + [self.word_to_idx[self.pad_token]] * to_add
-
-        # for i, line in enumerate(decoder_character_input):
-        #     line_len = input_seq_len[i]
-        #     to_add = self.max_seq_len - line_len
-        #     decoder_character_input[i] = line + [self.encode_characters(self.pad_token)] * to_add
 
         for i, line in enumerate(decoder_output):
             line_len = input_seq_len[i]
@@ -322,6 +316,5 @@ class BatchLoader:
         return characters_idx
 
     def decode_characters(self, characters_idx):
-        # character = self.idx_to_char[character_idx]
         characters = [self.idx_to_char[i] for i in characters_idx]
         return ''.join(characters)
