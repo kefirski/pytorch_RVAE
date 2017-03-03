@@ -96,12 +96,8 @@ class RVAE(nn.Module):
         def train(i, batch_size, use_cuda, dropout):
 
             input = batch_loader.next_batch(batch_size, 'train')
-
-            [encoder_word_input, encoder_character_input, decoder_word_input, target] = \
-                [Variable(t.from_numpy(var)) for var in input]
-
-            input = [encoder_word_input.long(), encoder_character_input.long(), decoder_word_input.long(),
-                     target.float()]
+            input = [Variable(t.from_numpy(var)) for var in input]
+            input = [var.long() for var in input]
             input = [var.cuda() if use_cuda else var for var in input]
 
             [encoder_word_input, encoder_character_input, decoder_word_input, target] = input
