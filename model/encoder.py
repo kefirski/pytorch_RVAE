@@ -4,7 +4,7 @@ import torch.nn.functional as F
 
 from selfModules.highway import Highway
 from selfModules.selflstm import self_LSTM
-
+from utils.functional import parameters_allocation_check
 
 class Encoder(nn.Module):
     def __init__(self, params):

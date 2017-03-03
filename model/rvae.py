@@ -19,7 +19,7 @@ class RVAE(nn.Module):
 
         self.params = params
 
-        self.embedding = Embedding(self.params, '../')
+        self.embedding = Embedding(self.params, '')
 
         self.encoder = Encoder(self.params)
 
