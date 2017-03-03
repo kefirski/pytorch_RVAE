@@ -93,17 +93,13 @@ class RVAE(nn.Module):
         def train(i, batch_size, use_cuda, dropout):
 
             input = batch_loader.next_batch(batch_size, 'train')
-
-            [encoder_word_input, encoder_character_input, decoder_word_input, _, target] = \
-                [Variable(t.from_numpy(var)) for var in input]
-
-            input = [encoder_word_input.long(), encoder_character_input.long(), decoder_word_input.long(),
-                     target.float()]
+            input = [Variable(t.from_numpy(var)) for var in input]
+            input = [var.long() for var in input]
             input = [var.cuda() if use_cuda else var for var in input]
 
             [encoder_word_input, encoder_character_input, decoder_word_input, target] = input
 
-            [batch_size, _] = decoder_word_input.size()
+            [batch_size, seq_len] = decoder_word_input.size()
 
             logits, _, kld = self(dropout,
                                   encoder_word_input, encoder_character_input,
@@ -111,12 +107,12 @@ class RVAE(nn.Module):
                                   z=None)
 
             logits = logits.view(-1, self.params.word_vocab_size)
-            prediction = F.softmax(logits)
-            target = target.view(-1, self.params.word_vocab_size)
+            target = target.view(-1)
 
-            bce = F.binary_cross_entropy(prediction, target, size_average=False)
+            bce = F.cross_entropy(logits, target, size_average=False)
 
-            loss = (bce + kld_coef(i) * kld) / batch_size
+            # bce is averaged over seq_len before sum with kld
+            loss = (bce/seq_len + kld_coef(i) * kld) / batch_size
 
             optimizer.zero_grad()
             loss.backward()

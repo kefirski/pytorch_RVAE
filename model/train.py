@@ -10,13 +10,13 @@ from utils.parameters import Parameters
 if __name__ == "__main__":
 
     if not os.path.exists('../data/word_embeddings.npy'):
-        raise FileNotFoundError("word embdeddings file was't found")
+        raise FileNotFoundError("word embeddings file was't found")
 
     parser = argparse.ArgumentParser(description='RVAE')
-    parser.add_argument('--num-iterations', type=int, default=90000, metavar='NI',
-                        help='num iterations (default: 90000)')
-    parser.add_argument('--batch-size', type=int, default=22, metavar='BS',
-                        help='batch size (default: 22)')
+    parser.add_argument('--num-iterations', type=int, default=120000, metavar='NI',
+                        help='num iterations (default: 120000)')
+    parser.add_argument('--batch-size', type=int, default=38, metavar='BS',
+                        help='batch size (default: 38)')
     parser.add_argument('--use-cuda', type=bool, default=True, metavar='CUDA',
                         help='use cuda (default: True)')
     parser.add_argument('--learning-rate', type=float, default=0.00005, metavar='LR',
