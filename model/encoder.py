@@ -1,9 +1,10 @@
 import torch as t
 import torch.nn as nn
 import torch.nn.functional as F
-from utils.selfModules.highway import Highway
+
+from selfModules.highway import Highway
+from selfModules.selflstm import self_LSTM
 from utils.functional import *
-from utils.selfModules.selflstm import self_LSTM
 
 
 class Encoder(nn.Module):

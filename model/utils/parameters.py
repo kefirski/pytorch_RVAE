@@ -1,4 +1,4 @@
-from utils.functional import *
+from .functional import *
 
 
 class Parameters:

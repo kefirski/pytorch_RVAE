@@ -11,8 +11,6 @@ class NEG_loss(nn.Module):
         """
         :param num_classes: An int. The number of possible classes.
         :param embed_size: An int. Embedding size
-        :param use_cuda: An bool. If true then samplings from noise will be stored in CUDA memory.
-            Notice that if use_cuda is True then it is necessary to store NEG_loss parameters in CUDA memory too
         """
 
         super(NEG_loss, self).__init__()

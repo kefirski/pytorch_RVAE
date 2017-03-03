@@ -1,7 +1,8 @@
 import torch as t
 import torch.nn as nn
 import torch.nn.functional as F
-from utils.selfModules.highway import Highway
+
+from selfModules.highway import Highway
 from utils.functional import *
 
 

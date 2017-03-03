@@ -4,22 +4,24 @@ import numpy as np
 import torch as t
 from torch.autograd import Variable
 from torch.optim import SGD
+
+from selfModules.neg import NEG_loss
 from utils.batch_loader import BatchLoader
-from utils.neg import NEG_loss
 from utils.parameters import Parameters
 
-parser = argparse.ArgumentParser(description='word2vec')
-parser.add_argument('--num-iterations', type=int, default=1000000, metavar='NI',
-                    help='num iterations (default: 1000000)')
-parser.add_argument('--batch-size', type=int, default=10, metavar='BS',
-                    help='batch size (default: 10)')
-parser.add_argument('--num-sample', type=int, default=5, metavar='NS',
-                    help='num sample (default: 5)')
-parser.add_argument('--use-cuda', type=bool, default=True, metavar='CUDA',
-                    help='use cuda (default: True)')
-args = parser.parse_args()
-
 if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser(description='word2vec')
+    parser.add_argument('--num-iterations', type=int, default=1000000, metavar='NI',
+                        help='num iterations (default: 1000000)')
+    parser.add_argument('--batch-size', type=int, default=10, metavar='BS',
+                        help='batch size (default: 10)')
+    parser.add_argument('--num-sample', type=int, default=5, metavar='NS',
+                        help='num sample (default: 5)')
+    parser.add_argument('--use-cuda', type=bool, default=True, metavar='CUDA',
+                        help='use cuda (default: True)')
+    args = parser.parse_args()
+
     batch_loader = BatchLoader()
     params = Parameters(batch_loader.max_word_len,
                         batch_loader.max_seq_len,

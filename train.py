@@ -1,9 +1,12 @@
 import argparse
 import os
+
 import numpy as np
 import torch as t
 from torch.optim import Adam
+
 from rvae import RVAE
+
 from utils.batch_loader import BatchLoader
 from utils.parameters import Parameters
 

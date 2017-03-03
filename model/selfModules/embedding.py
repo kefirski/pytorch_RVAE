@@ -1,8 +1,9 @@
-import torch as t
-from torch.nn import Parameter
-import torch.nn as nn
 import numpy as np
-from utils.selfModules.tdnn import TDNN
+import torch as t
+import torch.nn as nn
+from torch.nn import Parameter
+
+from .tdnn import TDNN
 
 
 class Embedding(nn.Module):

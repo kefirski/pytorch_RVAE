@@ -5,7 +5,7 @@ import re
 import numpy as np
 from six.moves import cPickle
 
-from utils.functional import *
+from .functional import *
 
 
 class BatchLoader:

@@ -14,21 +14,18 @@ with Kim's [Character-Aware Neural Language Models](https://arxiv.org/abs/1508.0
 - > the companies insisted that the color set could be included in the program
 
 ## Usage
-### Before model training it is neccesary to train word embeddings:
+### Before model training it is necessary to train word embeddings:
 ```
-$ cd model/utils
 $ python train_word_embeddings.py
 ```
 
 ### To train model use:
 ```
-$ cd model
 $ python train.py
 ```
 
 ### To sample data after training use:
 ```
-$ cd model
 $ python sample.py
 ```
 
