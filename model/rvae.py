@@ -112,15 +112,15 @@ class RVAE(nn.Module):
             logits = logits.view(-1, self.params.word_vocab_size)
             target = target.view(-1)
 
-            bce = F.cross_entropy(logits, target, size_average=False)
+            cross_entropy = F.cross_entropy(logits, target, size_average=False)
 
-            loss = (bce + kld_coef(i) * kld) / batch_size
+            loss = (cross_entropy + kld_coef(i) * kld) / batch_size
 
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
 
-            return bce, kld, kld_coef(i)
+            return cross_entropy, kld, kld_coef(i)
 
         return train
 

@@ -48,15 +48,15 @@ if __name__ == "__main__":
 
     for iteration in range(args.num_iterations):
 
-        bce, kld, coef = train_step(iteration, args.batch_size, args.use_cuda, args.dropout)
+        cross_entropy, kld, coef = train_step(iteration, args.batch_size, args.use_cuda, args.dropout)
 
         if iteration % 5 == 0:
             print('\n')
             print('------------TRAIN-------------')
             print('----------ITERATION-----------')
             print(iteration)
-            print('-------------BCE--------------')
-            print(bce.mean().data.cpu().numpy()[0])
+            print('--------CROSS-ENTROPY---------')
+            print(cross_entropy.mean().data.cpu().numpy()[0])
             print('-------------KLD--------------')
             print(kld.mean().data.cpu().numpy()[0])
             print('-----------KLD-coef-----------')
