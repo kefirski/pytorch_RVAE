@@ -19,7 +19,7 @@ if __name__ == "__main__":
                         help='num iterations (default: 120000)')
     parser.add_argument('--batch-size', type=int, default=38, metavar='BS',
                         help='batch size (default: 38)')
-    parser.add_argument('--use-cuda', type=bool, default=True, metavar='CUDA',
+    parser.add_argument('--use-cuda', type=bool, default=False, metavar='CUDA',
                         help='use cuda (default: True)')
     parser.add_argument('--learning-rate', type=float, default=0.00005, metavar='LR',
                         help='learning rate (default: 0.00005)')
@@ -42,7 +42,7 @@ if __name__ == "__main__":
     if args.use_cuda:
         rvae = rvae.cuda()
 
-    optimizer = Adam(rvae.learnable_paramters(), args.learning_rate)
+    optimizer = Adam(rvae.learnable_parameters(), args.learning_rate)
 
     train_step = rvae.trainer(optimizer, batch_loader)
 
