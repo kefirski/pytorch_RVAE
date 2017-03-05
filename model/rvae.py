@@ -137,7 +137,7 @@ class RVAE(nn.Module):
         decoder_character_input = Variable(t.from_numpy(decoder_character_input_np).long())
 
         if use_cuda:
-            decoder_word_input, decoder_character_input_np = decoder_word_input.cuda(), decoder_character_input.cuda()
+            decoder_word_input, decoder_character_input = decoder_word_input.cuda(), decoder_character_input.cuda()
 
         result = ''
 
@@ -165,7 +165,7 @@ class RVAE(nn.Module):
             decoder_character_input = Variable(t.from_numpy(decoder_character_input_np).long())
 
             if use_cuda:
-                decoder_word_input, decoder_character_input_np = decoder_word_input.cuda(), decoder_character_input.cuda()
+                decoder_word_input, decoder_character_input = decoder_word_input.cuda(), decoder_character_input.cuda()
 
         return result
 
