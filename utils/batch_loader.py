@@ -237,7 +237,7 @@ class BatchLoader:
 
         encoded_words = [[idx for idx in line] for line in encoder_word_input]
         decoder_word_input = [[self.word_to_idx[self.go_token]] + line for line in encoder_word_input]
-        decoder_character_input = [[self.encode_characters(self.go_token)] + line for line in encoder_character_input]
+        # decoder_character_input = [[self.encode_characters(self.go_token)] + line for line in encoder_character_input]
         decoder_output = [line + [self.word_to_idx[self.end_token]] for line in encoded_words]
 
         # sorry
@@ -245,11 +245,11 @@ class BatchLoader:
             line_len = input_seq_len[i]
             to_add = max_input_seq_len - line_len
             decoder_word_input[i] = line + [self.word_to_idx[self.pad_token]] * to_add
-
-        for i, line in enumerate(decoder_character_input):
-            line_len = input_seq_len[i]
-            to_add = max_input_seq_len - line_len
-            decoder_character_input[i] = line + [self.encode_characters(self.pad_token)] * to_add
+        #
+        # for i, line in enumerate(decoder_character_input):
+        #     line_len = input_seq_len[i]
+        #     to_add = max_input_seq_len - line_len
+        #     decoder_character_input[i] = line + [self.encode_characters(self.pad_token)] * to_add
 
         for i, line in enumerate(decoder_output):
             line_len = input_seq_len[i]
@@ -267,7 +267,7 @@ class BatchLoader:
             encoder_character_input[i] = [self.encode_characters(self.pad_token)] * to_add + line[::-1]
 
         return np.array(encoder_word_input), np.array(encoder_character_input), \
-               np.array(decoder_word_input), np.array(decoder_character_input), np.array(decoder_output)
+               np.array(decoder_word_input), np.array(decoder_output)
 
     def next_embedding_seq(self, seq_len):
         """
