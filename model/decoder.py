@@ -16,7 +16,7 @@ class Decoder(nn.Module):
         self.context_to_state = nn.Linear(self.params.latent_variable_size,
                                           self.params.decoder_rnn_size * self.params.decoder_num_layers)
 
-        self.rnn = nn.GRU(input_size=self.params.word_embed_size + self.params.latent_variable_size,
+        self.rnn = nn.GRU(input_size=self.params.word_embed_size + self.params.latent_variable_size + self.params.sum_depth,
                           hidden_size=self.params.decoder_rnn_size,
                           num_layers=self.params.decoder_num_layers,
                           batch_first=True)

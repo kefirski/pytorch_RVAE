@@ -30,7 +30,7 @@ class RVAE(nn.Module):
 
     def forward(self, drop_prob,
                 encoder_word_input=None, encoder_character_input=None,
-                decoder_word_input=None,
+                decoder_word_input=None, decoder_character_input=None,
                 z=None, initial_state=None):
         """
         :param encoder_word_input: An tensor with shape of [batch_size, seq_len] of Long type
@@ -82,7 +82,7 @@ class RVAE(nn.Module):
         else:
             kld = None
 
-        decoder_input = self.embedding.word_embed(decoder_word_input)
+        decoder_input = self.embedding(decoder_word_input, decoder_character_input)
         decoder_input = F.dropout(decoder_input, drop_prob)
         out, final_state = self.decoder(decoder_input, z, initial_state)
 
@@ -101,13 +101,13 @@ class RVAE(nn.Module):
             input = [var.long() for var in input]
             input = [var.cuda() if use_cuda else var for var in input]
 
-            [encoder_word_input, encoder_character_input, decoder_word_input, target] = input
+            [encoder_word_input, encoder_character_input, decoder_word_input, decoder_character_input, target] = input
 
             [batch_size, seq_len] = decoder_word_input.size()
 
             logits, _, kld = self(dropout,
                                   encoder_word_input, encoder_character_input,
-                                  decoder_word_input,
+                                  decoder_word_input, decoder_character_input,
                                   z=None)
 
             logits = logits.view(-1, self.params.word_vocab_size)
@@ -116,7 +116,7 @@ class RVAE(nn.Module):
             cross_entropy = F.cross_entropy(logits, target, size_average=False)/seq_len
 
             # cross entropy is weighted with coefficient to provide useful kld
-            loss = (65 * cross_entropy + kld_coef(i) * kld) / batch_size
+            loss = (78 * cross_entropy + kld_coef(i) * kld) / batch_size
 
             optimizer.zero_grad()
             loss.backward()
@@ -131,10 +131,10 @@ class RVAE(nn.Module):
         if use_cuda:
             seed = seed.cuda()
 
-        decoder_word_input_np, _ = batch_loader.go_input(1)
+        decoder_word_input_np, decoder_character_input_np = batch_loader.go_input(1)
 
         decoder_word_input = Variable(t.from_numpy(decoder_word_input_np).long())
-        # decoder_character_input = Variable(t.from_numpy(decoder_character_input_np).long())
+        decoder_character_input = Variable(t.from_numpy(decoder_character_input_np).long())
 
         if use_cuda:
             decoder_word_input = decoder_word_input.cuda()
@@ -145,7 +145,7 @@ class RVAE(nn.Module):
 
         for i in range(seq_len):
             logits, initial_state, _ = self(0., None, None,
-                                            decoder_word_input,
+                                            decoder_word_input, decoder_character_input,
                                             seed, initial_state)
 
             logits = logits.view(-1, self.params.word_vocab_size)
@@ -159,10 +159,10 @@ class RVAE(nn.Module):
             result += ' ' + word
 
             decoder_word_input_np = np.array([[batch_loader.word_to_idx[word]]])
-            # decoder_character_input_np = np.array([[batch_loader.encode_characters(word)]])
+            decoder_character_input_np = np.array([[batch_loader.encode_characters(word)]])
 
             decoder_word_input = Variable(t.from_numpy(decoder_word_input_np).long())
-            # decoder_character_input = Variable(t.from_numpy(decoder_character_input_np).long())
+            decoder_character_input = Variable(t.from_numpy(decoder_character_input_np).long())
 
             if use_cuda:
                 decoder_word_input = decoder_word_input.cuda()
