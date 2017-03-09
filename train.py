@@ -11,13 +11,13 @@ from model.rvae import RVAE
 
 if __name__ == "__main__":
 
-    if not os.path.exists('data/word_embeddings.npy'):
+    if not os.path.exists('../data/word_embeddings.npy'):
         raise FileNotFoundError("word embeddings file was't found")
 
     parser = argparse.ArgumentParser(description='RVAE')
     parser.add_argument('--num-iterations', type=int, default=120000, metavar='NI',
                         help='num iterations (default: 120000)')
-    parser.add_argument('--batch-size', type=int, default=38, metavar='BS',
+    parser.add_argument('--batch-size', type=int, default=32, metavar='BS',
                         help='batch size (default: 38)')
     parser.add_argument('--use-cuda', type=bool, default=True, metavar='CUDA',
                         help='use cuda (default: True)')
@@ -27,6 +27,10 @@ if __name__ == "__main__":
                         help='dropout (default: 0.3)')
     parser.add_argument('--use-trained', type=bool, default=False, metavar='UT',
                         help='load pretrained model (default: False)')
+    parser.add_argument('--ce-result', default='', metavar='CE',
+                        help='ce result path (default: '')')
+    parser.add_argument('--kld-result', default='', metavar='KLD',
+                        help='ce result path (default: '')')
 
     args = parser.parse_args()
 
@@ -46,6 +50,9 @@ if __name__ == "__main__":
 
     train_step = rvae.trainer(optimizer, batch_loader)
 
+    ce_result = []
+    kld_result = []
+
     for iteration in range(args.num_iterations):
 
         cross_entropy, kld, coef = train_step(iteration, args.batch_size, args.use_cuda, args.dropout)
@@ -63,6 +70,9 @@ if __name__ == "__main__":
             print(coef)
             print('------------------------------')
 
+        ce_result += [cross_entropy.mean().data.cpu().numpy()[0]]
+        kld_result += [kld.mean().data.cpu().numpy()[0]]
+
         if iteration % 20 == 0:
             seed = np.random.normal(size=[1, parameters.latent_variable_size])
 
@@ -75,3 +85,6 @@ if __name__ == "__main__":
             print('------------------------------')
 
     t.save(rvae.state_dict(), 'trained_RVAE')
+
+    np.save('ce_result_{}.npy'.format(args.ce_result), ce_result)
+    np.save('kld_result.npy_{}'.format(args.kld_result), kld_result)
