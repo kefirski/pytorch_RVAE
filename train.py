@@ -11,7 +11,7 @@ from model.rvae import RVAE
 
 if __name__ == "__main__":
 
-    if not os.path.exists('../data/word_embeddings.npy'):
+    if not os.path.exists('data/word_embeddings.npy'):
         raise FileNotFoundError("word embeddings file was't found")
 
     parser = argparse.ArgumentParser(description='RVAE')
@@ -86,5 +86,5 @@ if __name__ == "__main__":
 
     t.save(rvae.state_dict(), 'trained_RVAE')
 
-    np.save('ce_result_{}.npy'.format(args.ce_result), ce_result)
-    np.save('kld_result.npy_{}'.format(args.kld_result), kld_result)
+    np.save('ce_result_{}.npy'.format(args.ce_result), np.array(ce_result))
+    np.save('kld_result.npy_{}'.format(args.kld_result), np.array(kld_result))
