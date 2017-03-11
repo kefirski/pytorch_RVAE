@@ -14,7 +14,7 @@ class Encoder(nn.Module):
 
         self.hw1 = Highway(self.params.sum_depth + self.params.word_embed_size, 2, F.relu)
 
-        self.rnn = self_LSTM(input_size=self.params.word_embed_size + self.params.sum_depth,
+        self.rnn = nn.LSTM(input_size=self.params.word_embed_size + self.params.sum_depth,
                              hidden_size=self.params.encoder_rnn_size,
                              num_layers=self.params.encoder_num_layers,
                              batch_first=True,

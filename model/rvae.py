@@ -23,8 +23,8 @@ class RVAE(nn.Module):
 
         self.encoder = Encoder(self.params)
 
-        self.context_to_mu = self_Linear(self.params.latent_variable_size, self.params.latent_variable_size)
-        self.context_to_logvar = self_Linear(self.params.latent_variable_size, self.params.latent_variable_size)
+        self.context_to_mu = nn.Linear(self.params.latent_variable_size, self.params.latent_variable_size)
+        self.context_to_logvar = nn.Linear(self.params.latent_variable_size, self.params.latent_variable_size)
 
         self.decoder = Decoder(self.params)
 
