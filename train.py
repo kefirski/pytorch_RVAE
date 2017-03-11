@@ -49,6 +49,7 @@ if __name__ == "__main__":
     optimizer = Adam(rvae.learnable_parameters(), args.learning_rate)
 
     train_step = rvae.trainer(optimizer, batch_loader)
+    validate = rvae.validater(batch_loader)
 
     ce_result = []
     kld_result = []
@@ -70,8 +71,22 @@ if __name__ == "__main__":
             print(coef)
             print('------------------------------')
 
-        ce_result += [cross_entropy.mean().data.cpu().numpy()[0]]
-        kld_result += [kld.mean().data.cpu().numpy()[0]]
+        if iteration % 10 == 0:
+            cross_entropy, kld = validate(args.batch_size, args.use_cuda)
+
+            cross_entropy = cross_entropy.mean().data.cpu().numpy()[0]
+            kld = kld.mean().data.cpu().numpy()[0]
+
+            print('\n')
+            print('------------VALID-------------')
+            print('--------CROSS-ENTROPY---------')
+            print(cross_entropy)
+            print('-------------KLD--------------')
+            print(kld)
+            print('------------------------------')
+
+            ce_result += [cross_entropy]
+            kld_result += [kld]
 
         if iteration % 20 == 0:
             seed = np.random.normal(size=[1, parameters.latent_variable_size])
