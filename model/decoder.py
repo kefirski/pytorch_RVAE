@@ -16,7 +16,7 @@ class Decoder(nn.Module):
         self.context_to_state = nn.Linear(self.params.latent_variable_size,
                                           self.params.decoder_rnn_size * self.params.decoder_num_layers)
 
-        self.rnn = nn.GRU(input_size= self.params.latent_variable_size + self.params.sum_depth,
+        self.rnn = nn.GRU(input_size=self.params.latent_variable_size + self.params.word_embed_size,
                           hidden_size=self.params.decoder_rnn_size,
                           num_layers=self.params.decoder_num_layers,
                           batch_first=True)
@@ -29,7 +29,7 @@ class Decoder(nn.Module):
         :param z: sequence context with shape of [batch_size, latent_variable_size]
         :param initial_state: initial state of decoder rnn
 
-        :return: unnormalized logits of setnence words distribution probabilities
+        :return: unnormalized logits of sentense words distribution probabilities
                     with shape of [batch_size, seq_len, word_vocab_size]
                  final rnn state with shape of [num_layers, batch_size, decoder_rnn_size]
         """

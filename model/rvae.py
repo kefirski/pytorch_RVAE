@@ -8,7 +8,6 @@ from .decoder import Decoder
 from .encoder import Encoder
 
 from selfModules.embedding import Embedding
-from selfModules.selflinear import self_Linear
 
 from utils.functional import kld_coef, parameters_allocation_check, fold
 

@@ -3,8 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from selfModules.highway import Highway
-from selfModules.selflstm import self_LSTM
 from utils.functional import parameters_allocation_check
+
 
 class Encoder(nn.Module):
     def __init__(self, params):
@@ -15,10 +15,10 @@ class Encoder(nn.Module):
         self.hw1 = Highway(self.params.sum_depth + self.params.word_embed_size, 2, F.relu)
 
         self.rnn = nn.LSTM(input_size=self.params.word_embed_size + self.params.sum_depth,
-                             hidden_size=self.params.encoder_rnn_size,
-                             num_layers=self.params.encoder_num_layers,
-                             batch_first=True,
-                             bidirectional=True)
+                           hidden_size=self.params.encoder_rnn_size,
+                           num_layers=self.params.encoder_num_layers,
+                           batch_first=True,
+                           bidirectional=True)
 
         self.hw2 = Highway(self.rnn.hidden_size * 2, 2, F.relu)
         self.fc = nn.Linear(self.rnn.hidden_size * 2, self.params.latent_variable_size)
