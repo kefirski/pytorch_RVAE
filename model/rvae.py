@@ -82,7 +82,7 @@ class RVAE(nn.Module):
         else:
             kld = None
 
-        decoder_input = self.embedding(decoder_word_input, decoder_character_input)
+        decoder_input = self.embedding.word_embed(decoder_word_input)
         decoder_input = F.dropout(decoder_input, drop_prob)
         out, final_state = self.decoder(decoder_input, z, initial_state)
 
