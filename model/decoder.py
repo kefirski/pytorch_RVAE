@@ -2,7 +2,6 @@ import torch as t
 import torch.nn as nn
 import torch.nn.functional as F
 
-from selfModules.highway import Highway
 from utils.functional import parameters_allocation_check
 
 
@@ -12,14 +11,10 @@ class Decoder(nn.Module):
 
         self.params = params
 
-        self.hw1 = Highway(self.params.latent_variable_size, 2, F.relu)
-        self.context_to_state = nn.Linear(self.params.latent_variable_size,
-                                          self.params.decoder_rnn_size * self.params.decoder_num_layers)
-
-        self.rnn = nn.GRU(input_size=self.params.latent_variable_size + self.params.word_embed_size,
-                          hidden_size=self.params.decoder_rnn_size,
-                          num_layers=self.params.decoder_num_layers,
-                          batch_first=True)
+        self.rnn = nn.LSTM(input_size=self.params.latent_variable_size + self.params.word_embed_size,
+                           hidden_size=self.params.decoder_rnn_size,
+                           num_layers=self.params.decoder_num_layers,
+                           batch_first=True)
 
         self.fc = nn.Linear(self.params.decoder_rnn_size, self.params.word_vocab_size)
 
@@ -39,7 +34,8 @@ class Decoder(nn.Module):
 
         [batch_size, seq_len, _] = decoder_input.size()
 
-        ''' decoder rnn is conditioned on context via additional bias = W_cond * z to every input token
+        '''
+            decoder rnn is conditioned on context via additional bias = W_cond * z to every input token
         '''
         z = t.cat([z] * seq_len, 1).view(batch_size, seq_len, self.params.latent_variable_size)
         decoder_input = t.cat([decoder_input, z], 2)

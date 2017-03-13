@@ -18,7 +18,7 @@ class Parameters:
         self.encoder_rnn_size = 700
         self.encoder_num_layers = 2
 
-        self.latent_variable_size = 1100
+        self.latent_variable_size = 550
 
-        self.decoder_rnn_size = 800
-        self.decoder_num_layers = 2
+        self.decoder_rnn_size = 450
+        self.decoder_num_layers = 1

@@ -115,7 +115,7 @@ class RVAE(nn.Module):
             cross_entropy = F.cross_entropy(logits, target, size_average=False)/seq_len
 
             # cross entropy is weighted with coefficient to provide useful kld
-            loss = (81 * cross_entropy + kld_coef(i) * kld) / batch_size
+            loss = (cross_entropy + kld_coef(i) * kld) / batch_size
 
             optimizer.zero_grad()
             loss.backward()
@@ -193,4 +193,3 @@ class RVAE(nn.Module):
                 decoder_word_input, decoder_character_input = decoder_word_input.cuda(), decoder_character_input.cuda()
 
         return result
-
