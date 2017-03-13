@@ -37,7 +37,7 @@ class RVAE(nn.Module):
         :param decoder_word_input: An tensor with shape of [batch_size, max_seq_len + 1] of Long type
         :param initial_state: initial state of decoder rnn in order to perform sampling
 
-        :param drop_prob: probability of an element of context to be zeroed in sense of dropout
+        :param drop_prob: probability of an element of decoder input to be zeroed in sense of dropout
 
         :param z: context if sampling is performing
 
@@ -53,7 +53,7 @@ class RVAE(nn.Module):
         assert z is None and fold(lambda acc, parameter: acc and parameter is not None,
                                   [encoder_word_input, encoder_character_input, decoder_word_input],
                                   True) \
-            or (z is not None and decoder_word_input is not None), \
+               or (z is not None and decoder_word_input is not None), \
             "Invalid input. If z is None then encoder and decoder inputs should be passed as arguments"
 
         if z is None:
@@ -75,14 +75,13 @@ class RVAE(nn.Module):
 
             z = z * std + mu
 
-            kld = (-0.5 * t.sum(logvar - t.pow(mu, 2) - t.exp(logvar) + 1, 1)).sum().squeeze()
+            kld = (-0.5 * t.sum(logvar - t.pow(mu, 2) - t.exp(logvar) + 1, 1)).mean().squeeze()
 
         else:
             kld = None
 
         decoder_input = self.embedding.word_embed(decoder_word_input)
-        decoder_input = F.dropout(decoder_input, drop_prob)
-        out, final_state = self.decoder(decoder_input, z, initial_state)
+        out, final_state = self.decoder(decoder_input, z, drop_prob, initial_state)
 
         return out, final_state, kld
 
@@ -93,15 +92,12 @@ class RVAE(nn.Module):
 
     def trainer(self, optimizer, batch_loader):
         def train(i, batch_size, use_cuda, dropout):
-
             input = batch_loader.next_batch(batch_size, 'train')
             input = [Variable(t.from_numpy(var)) for var in input]
             input = [var.long() for var in input]
             input = [var.cuda() if use_cuda else var for var in input]
 
             [encoder_word_input, encoder_character_input, decoder_word_input, decoder_character_input, target] = input
-
-            [batch_size, seq_len] = decoder_word_input.size()
 
             logits, _, kld = self(dropout,
                                   encoder_word_input, encoder_character_input,
@@ -110,9 +106,7 @@ class RVAE(nn.Module):
 
             logits = logits.view(-1, self.params.word_vocab_size)
             target = target.view(-1)
-
-            cross_entropy = F.cross_entropy(logits, target, size_average=False) / (seq_len * batch_size)
-            kld = kld / batch_size
+            cross_entropy = F.cross_entropy(logits, target)
 
             loss = cross_entropy + kld_coef(i) * kld
 
@@ -126,15 +120,12 @@ class RVAE(nn.Module):
 
     def validater(self, batch_loader):
         def validate(batch_size, use_cuda):
-
             input = batch_loader.next_batch(batch_size, 'valid')
             input = [Variable(t.from_numpy(var)) for var in input]
             input = [var.long() for var in input]
             input = [var.cuda() if use_cuda else var for var in input]
 
             [encoder_word_input, encoder_character_input, decoder_word_input, decoder_character_input, target] = input
-
-            [_, seq_len] = decoder_word_input.size()
 
             logits, _, kld = self(0.,
                                   encoder_word_input, encoder_character_input,
@@ -144,9 +135,9 @@ class RVAE(nn.Module):
             logits = logits.view(-1, self.params.word_vocab_size)
             target = target.view(-1)
 
-            cross_entropy = F.cross_entropy(logits, target, size_average=False)/(seq_len * batch_size)
+            cross_entropy = F.cross_entropy(logits, target)
 
-            return cross_entropy, kld/batch_size
+            return cross_entropy, kld
 
         return validate
 
