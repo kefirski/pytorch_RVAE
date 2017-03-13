@@ -77,7 +77,6 @@ class RVAE(nn.Module):
 
             kld = (-0.5 * t.sum(logvar - t.pow(mu, 2) - t.exp(logvar) + 1, 1)).sum().squeeze()
 
-
         else:
             kld = None
 
@@ -145,9 +144,9 @@ class RVAE(nn.Module):
             logits = logits.view(-1, self.params.word_vocab_size)
             target = target.view(-1)
 
-            cross_entropy = F.cross_entropy(logits, target, size_average=False)/seq_len
+            cross_entropy = F.cross_entropy(logits, target, size_average=False)/(seq_len * batch_size)
 
-            return cross_entropy, kld
+            return cross_entropy, kld/batch_size
 
         return validate
 
