@@ -15,10 +15,10 @@ class Parameters:
         self.kernels = [(1, 25), (2, 50), (3, 75), (4, 100), (5, 125), (6, 150)]
         self.sum_depth = fold(lambda x, y: x + y, [depth for _, depth in self.kernels], 0)
 
-        self.encoder_rnn_size = 700
-        self.encoder_num_layers = 2
+        self.encoder_rnn_size = 600
+        self.encoder_num_layers = 1
 
-        self.latent_variable_size = 500
+        self.latent_variable_size = 1100
 
-        self.decoder_rnn_size = 370
-        self.decoder_num_layers = 1
+        self.decoder_rnn_size = 800
+        self.decoder_num_layers = 2

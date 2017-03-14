@@ -20,9 +20,6 @@ class Encoder(nn.Module):
                            batch_first=True,
                            bidirectional=True)
 
-        self.hw2 = Highway(self.rnn.hidden_size * 2, 2, F.relu)
-        self.fc = nn.Linear(self.rnn.hidden_size * 2, self.params.latent_variable_size)
-
     def forward(self, input):
         """
         :param input: [batch_size, seq_len, embed_size] tensor
@@ -38,7 +35,7 @@ class Encoder(nn.Module):
         assert parameters_allocation_check(self), \
             'Invalid CUDA options. Parameters should be allocated in the same memory'
 
-        ''' Unfold rnn with zero initial state and get its final state from last layer
+        ''' Unfold rnn with zero initial state and get its final state from the last layer
         '''
         _, (_, final_state) = self.rnn(input)
 
@@ -47,7 +44,4 @@ class Encoder(nn.Module):
         h_1, h_2 = final_state[0], final_state[1]
         final_state = t.cat([h_1, h_2], 1)
 
-        context = self.hw2(final_state)
-        context = F.relu(self.fc(context))
-
-        return context
+        return final_state

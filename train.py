@@ -74,8 +74,8 @@ if __name__ == "__main__":
         if iteration % 10 == 0:
             cross_entropy, kld = validate(args.batch_size, args.use_cuda)
 
-            cross_entropy = cross_entropy.mean().data.cpu().numpy()[0]
-            kld = kld.mean().data.cpu().numpy()[0]
+            cross_entropy = cross_entropy.data.cpu().numpy()[0]
+            kld = kld.data.cpu().numpy()[0]
 
             print('\n')
             print('------------VALID-------------')

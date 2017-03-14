@@ -22,8 +22,8 @@ class RVAE(nn.Module):
 
         self.encoder = Encoder(self.params)
 
-        self.context_to_mu = nn.Linear(self.params.latent_variable_size, self.params.latent_variable_size)
-        self.context_to_logvar = nn.Linear(self.params.latent_variable_size, self.params.latent_variable_size)
+        self.context_to_mu = nn.Linear(self.rnn.encoder_rnn_size * 2, self.params.latent_variable_size)
+        self.context_to_logvar = nn.Linear(self.rnn.encoder_rnn_size * 2, self.params.latent_variable_size)
 
         self.decoder = Decoder(self.params)
 
@@ -53,7 +53,7 @@ class RVAE(nn.Module):
         assert z is None and fold(lambda acc, parameter: acc and parameter is not None,
                                   [encoder_word_input, encoder_character_input, decoder_word_input],
                                   True) \
-               or (z is not None and decoder_word_input is not None), \
+            or (z is not None and decoder_word_input is not None), \
             "Invalid input. If z is None then encoder and decoder inputs should be passed as arguments"
 
         if z is None:
@@ -76,7 +76,6 @@ class RVAE(nn.Module):
             z = z * std + mu
 
             kld = (-0.5 * t.sum(logvar - t.pow(mu, 2) - t.exp(logvar) + 1, 1)).mean().squeeze()
-
         else:
             kld = None
 
@@ -108,7 +107,7 @@ class RVAE(nn.Module):
             target = target.view(-1)
             cross_entropy = F.cross_entropy(logits, target)
 
-            loss = cross_entropy + kld_coef(i) * kld
+            loss = 79 * cross_entropy + kld_coef(i) * kld
 
             optimizer.zero_grad()
             loss.backward()
